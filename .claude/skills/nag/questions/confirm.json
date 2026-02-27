@@ -1,0 +1,12 @@
+{
+  "questions": [{
+    "question": "Looking good?",
+    "header": "Confirm",
+    "options": [
+      {"label": "✅ Lovely, add it", "description": "Commit and push"},
+      {"label": "✏️ Hang on", "description": "I'd like to tweak something"},
+      {"label": "❌ Actually, no", "description": "Discard this"}
+    ],
+    "multiSelect": false
+  }]
+}

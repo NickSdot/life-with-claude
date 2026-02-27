@@ -1,0 +1,13 @@
+{
+  "questions": [{
+    "question": "What needs changing?",
+    "header": "Field",
+    "options": [
+      {"label": "📌 Title", "description": "Change what it's called"},
+      {"label": "⭐ Priority", "description": "More or less urgent"},
+      {"label": "📝 Description", "description": "Reword the summary"},
+      {"label": "📄 Details", "description": "Extended context"}
+    ],
+    "multiSelect": false
+  }]
+}
