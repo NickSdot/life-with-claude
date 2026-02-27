@@ -111,8 +111,8 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 - Transform user's raw thoughts into a polished entry:
   - **Category**: Infer from keywords (broken/crash → bug, annoying/awkward → flaw, want/wish → wish)
   - **Priority**: Infer from severity/frequency mentioned
-  - **Title**: Distill to 5-8 words, action-oriented, specific (not just echoing user)
-  - **Description**: Capture the core issue clearly, add context if obvious, strip frustration
+  - **Title**: 5-10 words, action-oriented, MUST include key context (e.g., "plan mode" if that's the context). Don't over-generalise—preserve the specific scenario.
+  - **Description**: Capture the full nuance. Include: what happens, when/where it happens, why it's problematic, what would be better. Don't strip detail that helps understand the issue.
 
 **If no text** (just `/nag add`):
 1. Output: "What's the issue?" (wait for user to type description)
@@ -121,15 +121,16 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 4. Transform user's description into title + polished description (same rules as text-provided case)
 
 Then:
-1. `parse-readme.py next-id <category>` → get ID (e.g. "B001")
+1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
 2. Read `templates/proposal.md`, fill placeholders, output as markdown
-3. Read `questions/confirm.json`, call AskUserQuestion:
-   - "Lovely" → continue to step 4
+3. **Also show GitHub issue preview**: Get template from `bootstrap.py GH_ISSUE_TEMPLATE[category]`, read from `templates/github.com_anthropics_claude-code/{template}`, fill with entry data, output as "GitHub issue preview:" so user sees exactly what will be filed
+4. Read `questions/confirm.json`, call AskUserQuestion:
+   - "Lovely" → continue to step 5
    - "Hang on" → ask what to change, update values, go back to step 2
    - "No" → output "Alright, discarded." and stop
-4. `add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-5. `commit.sh "➕ {ID}: {title}" README.md`
-6. Remind user: "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
+5. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
+6. `commit.sh "➕ {ID}: {title}" README.md`
+7. Remind user: "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
 
