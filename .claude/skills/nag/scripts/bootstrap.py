@@ -1,0 +1,116 @@
+"""
+Bootstrap module for /nag skill.
+
+Loads constants, provides normalization maps, runs daily maintenance.
+Import this module to access paths, maps, and trigger daily checks.
+"""
+
+import subprocess
+from datetime import date
+from pathlib import Path
+
+
+# === Normalization Maps ===
+# Accept raw questionnaire answers and normalize to clean values
+
+CATEGORY_MAP = {
+    "🐛 Bug": "bug",
+    "🤔 Flaw": "flaw",
+    "💫 Wish": "wish",
+    "bug": "bug",
+    "flaw": "flaw",
+    "wish": "wish",
+}
+
+PRIORITY_MAP = {
+    "⭐⭐⭐ High": "⭐⭐⭐",
+    "⭐⭐ Medium": "⭐⭐",
+    "⭐ Low": "⭐",
+    "⭐⭐⭐": "⭐⭐⭐",
+    "⭐⭐": "⭐⭐",
+    "⭐": "⭐",
+}
+
+CATEGORY_HEADERS = {
+    "bug": "## 🐛 Bugs",
+    "flaw": "## 🤔 Flaws",
+    "wish": "## 💫 Wishes",
+}
+
+CATEGORY_EMOJI = {
+    "bug": "🐛",
+    "flaw": "🤔",
+    "wish": "💫",
+}
+
+ID_PREFIX = {
+    "bug": "B",
+    "flaw": "F",
+    "wish": "W",
+}
+
+GH_ISSUE_TEMPLATE = {
+    "bug": "bug_report.yml",
+    "flaw": "model_behavior.yml",
+    "wish": "feature_request.yml",
+}
+
+
+def normalize_category(raw):
+    """Normalize category from raw input."""
+    return CATEGORY_MAP.get(raw, raw.lower() if isinstance(raw, str) else raw)
+
+
+def normalize_priority(raw):
+    """Normalize priority from raw input."""
+    return PRIORITY_MAP.get(raw, raw)
+
+
+# === Path Constants ===
+
+def _load_constants():
+    """Load constants from constants.sh."""
+    constants = {}
+    script_dir = Path(__file__).parent
+    constants_file = script_dir / "constants.sh"
+
+    for line in constants_file.read_text().splitlines():
+        if line.startswith("export "):
+            line = line[7:]
+        if "=" in line and not line.startswith("#"):
+            key, value = line.split("=", 1)
+            value = value.strip('"').strip("'")
+            value = value.replace("$LWC_REPO", constants.get("LWC_REPO", ""))
+            value = value.replace("$LWC_SKILL_DIR", constants.get("LWC_SKILL_DIR", ""))
+            value = value.replace("$LWC_TEMPLATES_DIR", constants.get("LWC_TEMPLATES_DIR", ""))
+            constants[key] = value
+    return constants
+
+
+_CONSTANTS = _load_constants()
+
+WISHLIST_REPO = _CONSTANTS["LWC_REPO"]
+SKILL_DIR = _CONSTANTS["LWC_SKILL_DIR"]
+README_PATH = Path(_CONSTANTS["LWC_README_PATH"])
+DETAILS_DIR = Path(_CONSTANTS["LWC_DETAILS_DIR"])
+SCRIPTS_DIR = Path(_CONSTANTS["LWC_SCRIPTS_DIR"])
+TEMPLATES_DIR = Path(_CONSTANTS["LWC_TEMPLATES_DIR"])
+GH_TEMPLATES_DIR = Path(_CONSTANTS["LWC_GH_TEMPLATES_DIR"])
+
+
+# === Daily Maintenance ===
+
+def _daily_check():
+    """Fetch GH templates if not done today. Runs silently."""
+    last_fetch_file = GH_TEMPLATES_DIR / ".last_fetch"
+    today = date.today().isoformat()
+
+    if last_fetch_file.exists() and last_fetch_file.read_text().strip() == today:
+        return
+
+    fetch_script = SCRIPTS_DIR / "fetch-gh-templates.sh"
+    if fetch_script.exists():
+        subprocess.run(["bash", str(fetch_script)], capture_output=True)
+
+
+_daily_check()
