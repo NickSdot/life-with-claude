@@ -100,8 +100,19 @@ GH_TEMPLATES_DIR = Path(_CONSTANTS["LWC_GH_TEMPLATES_DIR"])
 
 # === Daily Maintenance ===
 
+def _generate_markdown_templates():
+    """Generate markdown fill-in templates from YAML sources."""
+    try:
+        # Import here to avoid circular dependency
+        from generate_issue_templates import generate_all
+        generate_all()
+    except Exception:
+        # Silently fail - not critical
+        pass
+
+
 def _daily_check():
-    """Fetch GH templates if not done today. Runs silently."""
+    """Fetch GH templates if not done today, regenerate markdown only if changed. Runs silently."""
     last_fetch_file = GH_TEMPLATES_DIR / ".last_fetch"
     today = date.today().isoformat()
 
@@ -110,7 +121,10 @@ def _daily_check():
 
     fetch_script = SCRIPTS_DIR / "fetch-gh-templates.sh"
     if fetch_script.exists():
-        subprocess.run(["bash", str(fetch_script)], capture_output=True)
+        result = subprocess.run(["bash", str(fetch_script)], capture_output=True, text=True)
+        # Only regenerate if templates actually changed
+        if "TEMPLATES_CHANGED" in result.stdout:
+            _generate_markdown_templates()
 
 
 _daily_check()

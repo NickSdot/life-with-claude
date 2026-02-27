@@ -22,6 +22,12 @@ fi
 
 mkdir -p "$GH_TEMPLATES_DIR"
 
+# Compute hash of current templates
+hash_before=""
+if [ -d "$GH_TEMPLATES_DIR" ]; then
+    hash_before=$(cat "$GH_TEMPLATES_DIR"/*.yml 2>/dev/null | shasum -a 256 | cut -d' ' -f1)
+fi
+
 # Fetch templates from claude-code repo
 echo "Fetching GitHub issue templates..."
 
@@ -33,4 +39,11 @@ done
 # Record fetch date
 date +%Y-%m-%d > "$LAST_FETCH_FILE"
 
-echo "Templates updated"
+# Check if templates changed
+hash_after=$(cat "$GH_TEMPLATES_DIR"/*.yml 2>/dev/null | shasum -a 256 | cut -d' ' -f1)
+
+if [ "$hash_before" != "$hash_after" ]; then
+    echo "TEMPLATES_CHANGED"
+else
+    echo "Templates unchanged"
+fi
