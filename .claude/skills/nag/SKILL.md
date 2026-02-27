@@ -11,6 +11,8 @@ model: claude-opus-4-5
 
 Track issues about Claude Code.
 
+**All paths below are relative to this skill's directory** (`.claude/skills/nag/`).
+
 ## Tone
 
 - Concise: as short as possible whilst capturing what matters
@@ -82,13 +84,13 @@ In `templates/`. To display a template:
 
 - `reference/detail-files.md` — Load when **creating GitHub issues**. MUST use templates from `templates/github.com_anthropics_claude-code/`.
 
-## IDs & Emojis
+## IDs, Emojis & GitHub Templates
 
-| Type | ID prefix | Emoji | Indicates |
-|------|-----------|-------|-----------|
-| Bug | B | 🐛 | Broken, crash, error, fails |
-| Flaw | F | 🤔 | Annoying, awkward, clunky |
-| Wish | W | 💫 | Would be nice, want, please add |
+| Type | ID prefix | Emoji | GitHub template |
+|------|-----------|-------|-----------------|
+| Bug | B | 🐛 | `templates/github.com_anthropics_claude-code/bug_report.yml` |
+| Flaw | F | 🤔 | `templates/github.com_anthropics_claude-code/model_behavior.yml` |
+| Wish | W | 💫 | `templates/github.com_anthropics_claude-code/feature_request.yml` |
 
 Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
 
@@ -123,7 +125,7 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 Then:
 1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
 2. Read `templates/proposal.md`, fill placeholders, output as markdown
-3. **Also show GitHub issue preview**: Get template from `bootstrap.py GH_ISSUE_TEMPLATE[category]`, read from `templates/github.com_anthropics_claude-code/{template}`, fill with entry data, output as "GitHub issue preview:" so user sees exactly what will be filed
+3. **Also show GitHub issue preview**: Read the GitHub template for this category (see "IDs, Emojis & GitHub Templates" table above), fill with entry data, output as "GitHub issue preview:" so user sees exactly what will be filed
 4. Read `questions/confirm.json`, call AskUserQuestion:
    - "Lovely" → continue to step 5
    - "Hang on" → ask what to change, update values, go back to step 2
@@ -143,16 +145,15 @@ Load `reference/detail-files.md`.
 3. `push.sh` → push any pending commits first
 4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
 5. Check if `details/{ID}.md` exists (Read tool)
-6. Get template filename from `bootstrap.py GH_ISSUE_TEMPLATE[category]`
-7. Read template from `templates/github.com_anthropics_claude-code/{template}`
-8. Build issue body following template's YAML structure
-9. Write body to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
-10. `create-issue.sh "{ID}" "{title}" "$TMPDIR/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
-11. `python3 link-issue.py {ID} {url}` → updates README with issue link
-12. `python3 issues.py set {ID} {url}`
-13. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
-14. `push.sh`
-15. Output the issue URL
+6. Read the GitHub template for this category (see "IDs, Emojis & GitHub Templates" table)
+7. Build issue body following template's YAML structure
+8. Write body to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
+9. `create-issue.sh "{ID}" "{title}" "$TMPDIR/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
+10. `python3 link-issue.py {ID} {url}` → updates README with issue link
+11. `python3 issues.py set {ID} {url}`
+12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
+13. `push.sh`
+14. Output the issue URL
 
 ## Workflow: /nag yay <target>
 
