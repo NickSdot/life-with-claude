@@ -186,8 +186,8 @@ Load `reference/detail-files.md`.
    - `model` → `templates/github-issue-model.md`
    - `feature` → `templates/github-issue-feature.md`
 7. Fill all `{{PLACEHOLDERS}}` in the template
-8. Write filled template to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
-9. `create-issue.sh "{ID}" "{title}" "$TMPDIR/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
+8. Write filled template to `.claude/tmp/nag-issue-{ID}.md` (Write tool)
+9. `create-issue.sh "{template}" "{title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
 10. `python3 link-issue.py {ID} {url}` → updates README with issue link
 11. `python3 issues.py set {ID} {url}` → replace template name with actual URL
 12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
