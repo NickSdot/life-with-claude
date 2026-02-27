@@ -4,7 +4,8 @@ description: Manage Life With Claude feedback (bugs, flaws, wishes). Commands: a
 argument-hint: "[add|fin|yay|doh] [ID or search]"
 disable-model-invocation: true
 context: fork
-model: claude-opus-4-5
+agent: general-purpose
+model: opus
 ---
 
 # /nag
@@ -67,22 +68,42 @@ In `questions/`. To ask a question:
 
 ## Templates
 
-In `templates/`. To display a template:
+In `templates/`. To use a template:
 1. Read the file with Read tool
 2. Replace `{{PLACEHOLDER}}` with actual values
 3. Output the result as markdown text (not via a tool)
 
+### Display Templates
+
 | File | Placeholders |
 |------|-------------|
-| `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}`, `{{GITHUB_ISSUE_BODY}}` (fill from GitHub template for this category) |
+| `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}`, `{{GITHUB_ISSUE_BODY}}` |
 | `status.md` | `{{BUGS}}`, `{{FLAWS}}`, `{{WISHES}}` |
 | `celebration.md` | `{{ID}}`, `{{TITLE}}` |
 | `edit-display.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}` |
-| `issue-body.md` | `{{ID}}`, `{{DESCRIPTION}}` |
+
+### GitHub Issue Templates
+
+Use these to build `{{GITHUB_ISSUE_BODY}}`. Read, fill placeholders, preserve structure exactly.
+
+| File | Use when |
+|------|----------|
+| `github-issue-bug.md` | Crashes, errors, CLI misbehavior, infrastructure issues |
+| `github-issue-model.md` | Claude said/did something unexpected: wrong files, ignored instructions, bad assumptions |
+| `github-issue-feature.md` | New capabilities, enhancements, "it would be nice if..." |
+
+**CRITICAL**: These templates are structured to match GitHub's issue forms. Do NOT:
+- Change checkbox syntax (keep `- [x]` exactly)
+- Remove or reorder sections
+- Alter heading levels
+- Remove links in checkbox labels
+
+For unknown fields, use "Unknown" or "N/A" rather than omitting.
 
 ## Reference
 
-- `reference/detail-files.md` — Load when **creating GitHub issues**. MUST use templates from `templates/github.com_anthropics_claude-code/`.
+- `reference/detail-files.md` — Load when **creating GitHub issues**.
+- `templates/github.com_anthropics_claude-code/*.yml` — Original GitHub template definitions (for reference only, use the markdown templates above)
 
 ## IDs & Emojis
 
@@ -93,18 +114,6 @@ In `templates/`. To display a template:
 | Wish | W | 💫 | Would be nice, want, please add |
 
 Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
-
-## GitHub Templates
-
-Choose template based on **issue content**, not category. All in `templates/github.com_anthropics_claude-code/`:
-
-| Template | Use when |
-|----------|----------|
-| `bug_report.yml` | Crashes, errors, CLI misbehavior, infrastructure issues, things not working as documented |
-| `model_behavior.yml` | Claude (the model) said/did something unexpected in conversation: modified wrong files, ignored instructions, made bad assumptions |
-| `feature_request.yml` | New capabilities, enhancements, "it would be nice if..." |
-
-**IMPORTANT**: Follow the YAML structure EXACTLY. Each template has specific fields (dropdowns, checkboxes, textareas). Read the template and fill EVERY field in `body:` according to its type and description.
 
 ## Lookup (for fin/yay/doh)
 
@@ -131,25 +140,31 @@ Choose template based on **issue content**, not category. All in `templates/gith
 **If no text** (just `/nag add`):
 1. Output: "What's the issue?" (wait for user to type description)
 2. User submits description
-3. Immediately call AskUserQuestion with `questions/add.json` (category + priority)
+3. Immediately call AskUserQuestion with `questions/add.json` (category + priority + template)
 4. Transform user's description into title + polished description (same rules as text-provided case)
+
+**Template mapping** (from questionnaire answer):
+- "🐛 Bug report" → `bug` (uses `github-issue-bug.md`)
+- "🤖 Model behaviour" → `model` (uses `github-issue-model.md`)
+- "✨ Feature request" → `feature` (uses `github-issue-feature.md`)
+- "📝 None" → `none` (no GitHub issue)
 
 Then:
 1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
-2. Choose the best GitHub template based on issue content (see "GitHub Templates" table). Fill EVERY field from the YAML `body:` section:
-   - `type: dropdown` → pick the most appropriate option
-   - `type: checkbox` → mark as checked [x] or unchecked [ ]
-   - `type: textarea` → write content matching the placeholder guidance
-   - `type: input` → provide value (use "Unknown" if not available)
-   Format the filled template as markdown. This becomes `{{GITHUB_ISSUE_BODY}}`
-3. Read `templates/proposal.md`, fill all placeholders including `{{GITHUB_ISSUE_BODY}}`, output as markdown
+2. **If template is NOT "none":**
+   - Read the chosen template (e.g. `templates/github-issue-bug.md`), fill all `{{PLACEHOLDERS}}`. This becomes `{{GITHUB_ISSUE_BODY}}`
+   - Read `templates/proposal.md`, fill all placeholders, output as markdown
+3. **If template IS "none":**
+   - Skip GitHub preview. Show only: ID, category, priority, title, description
 4. Read `questions/confirm.json`, call AskUserQuestion:
    - "Lovely" → continue to step 5
-   - "Hang on" → ask what to change, update values, go back to step 3
+   - "Hang on" → ask what to change, update values, go back to step 2
    - "No" → output "Alright, discarded." and stop
 5. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-6. `commit.sh "➕ {ID}: {title}" README.md`
-7. Remind user: "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
+6. `python3 issues.py set {ID} {template}` → store template choice (e.g. "bug", "model", "feature", or "none")
+7. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json`
+8. **If template is "none":** "Committed locally. This entry won't create a GitHub issue."
+   **Otherwise:** "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
 
@@ -158,16 +173,23 @@ If user wants extended details during edit: load `reference/detail-files.md`, co
 Load `reference/detail-files.md`.
 
 1. Lookup entry
-2. `python3 issues.py get {ID}` → if URL returned, report it and stop
+2. `python3 issues.py get {ID}` → check stored value:
+   - If `"none"` → output "No GitHub issue configured for this entry." and stop
+   - If starts with `http` → output "Issue already exists: {url}" and stop
+   - If template name (`bug`, `model`, `feature`) → continue with that template
+   - If not found (exit 1) → ask which template to use
 3. `push.sh` → push any pending commits first
 4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
 5. Check if `details/{ID}.md` exists (Read tool)
-6. Choose the best GitHub template based on issue content (see "GitHub Templates" table)
-7. Build issue body following template's YAML structure
-8. Write body to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
+6. Read the template file based on stored value:
+   - `bug` → `templates/github-issue-bug.md`
+   - `model` → `templates/github-issue-model.md`
+   - `feature` → `templates/github-issue-feature.md`
+7. Fill all `{{PLACEHOLDERS}}` in the template
+8. Write filled template to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
 9. `create-issue.sh "{ID}" "{title}" "$TMPDIR/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
 10. `python3 link-issue.py {ID} {url}` → updates README with issue link
-11. `python3 issues.py set {ID} {url}`
+11. `python3 issues.py set {ID} {url}` → replace template name with actual URL
 12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
 13. `push.sh`
 14. Output the issue URL

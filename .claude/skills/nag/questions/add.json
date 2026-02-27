@@ -19,6 +19,17 @@
         {"label": "⭐ Low", "description": "Nice to have, no rush"}
       ],
       "multiSelect": false
+    },
+    {
+      "question": "Which GitHub issue template fits best?",
+      "header": "Template",
+      "options": [
+        {"label": "🐛 Bug report", "description": "Crashes, errors, CLI misbehaviour"},
+        {"label": "🤖 Model behaviour", "description": "Claude did something unexpected"},
+        {"label": "✨ Feature request", "description": "New capabilities, enhancements"},
+        {"label": "📝 None", "description": "Just track locally, no GitHub issue"}
+      ],
+      "multiSelect": false
     }
   ]
 }
