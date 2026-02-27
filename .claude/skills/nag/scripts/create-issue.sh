@@ -1,25 +1,35 @@
 #!/bin/bash
 # Create a GitHub issue for a wishlist entry.
-# Usage: create-issue.sh <entry-id> <title> <body-file>
+# Usage: create-issue.sh <template> <title> <body-file>
+# Template: bug, model, or feature (determines title prefix)
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/constants.sh"
 
-ENTRY_ID="$1"
+TEMPLATE="$1"
 TITLE="$2"
 BODY_FILE="$3"
 
-if [ -z "$ENTRY_ID" ] || [ -z "$TITLE" ] || [ -z "$BODY_FILE" ]; then
-    echo "Usage: create-issue.sh <entry-id> <title> <body-file>"
+if [ -z "$TEMPLATE" ] || [ -z "$TITLE" ] || [ -z "$BODY_FILE" ]; then
+    echo "Usage: create-issue.sh <template> <title> <body-file>"
+    echo "Template: bug, model, or feature"
     exit 1
 fi
 
-# Create the issue
+# Map template to title prefix (matching GitHub YAML templates)
+case "$TEMPLATE" in
+    bug)     PREFIX="[BUG]" ;;
+    model)   PREFIX="[MODEL]" ;;
+    feature) PREFIX="[FEATURE]" ;;
+    *)       PREFIX="" ;;
+esac
+
+# Create the issue with proper prefix
 ISSUE_URL=$(gh issue create \
     --repo "$LWC_CLAUDE_CODE_REPO" \
-    --title "$ENTRY_ID: $TITLE" \
+    --title "$PREFIX $TITLE" \
     --body-file "$BODY_FILE")
 
 echo "Created issue: $ISSUE_URL"
