@@ -23,9 +23,9 @@ def add_entry(entry_id, category, priority, title, description):
     section_header = CATEGORY_HEADERS[category]
     priority_num = len(priority)
 
-    # Create the new table row (empty Issue column)
+    # Create the new table row (empty Done and Issue columns)
     anchor = entry_id.lower()
-    new_row = f"| [ ] | {entry_id} | {priority} | [{title}](#{anchor}) | |"
+    new_row = f"| | {entry_id} | {priority} | [{title}](#{anchor}) | |"
 
     # Find the section and its table
     section_pattern = rf"({re.escape(section_header)}\n\| Done \| ID \| ⭐ \| Title \| Issue \|\n\|------\|----\|----\|-------\|-------\|)\n((?:\|[^\n]*\n)*)"

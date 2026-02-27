@@ -11,19 +11,19 @@ from bootstrap import README_PATH
 
 
 def mark_done(entry_id):
-    """Mark an entry as done by changing [ ] to [x] in its table row."""
+    """Mark an entry as done by adding ✅ to its Done column."""
     content = README_PATH.read_text()
 
-    # Find the row with this entry ID and change [ ] to [x]
-    # Pattern: | [ ] | B001 | ...
-    pattern = rf"\| \[ \] \| ({re.escape(entry_id)}) \|"
-    replacement = rf"| [x] | \1 |"
+    # Find the row with this entry ID and add ✅ to empty Done column
+    # Pattern: | | B001 | ... (empty Done column)
+    pattern = rf"\| \| ({re.escape(entry_id)}) \|"
+    replacement = rf"| ✅ | \1 |"
 
     new_content, count = re.subn(pattern, replacement, content, flags=re.IGNORECASE)
 
     if count == 0:
         # Check if already done
-        if re.search(rf"\| \[x\] \| {re.escape(entry_id)} \|", content, re.IGNORECASE):
+        if re.search(rf"\| ✅ \| {re.escape(entry_id)} \|", content, re.IGNORECASE):
             print(f"{entry_id} is already marked as done")
             return False
         print(f"Entry {entry_id} not found")
@@ -38,8 +38,8 @@ def get_entry_title(entry_id):
     """Get the title of an entry."""
     content = README_PATH.read_text()
 
-    # Find in table: | [x] | B001 | ⭐⭐⭐ | [Title here](#b001) |
-    pattern = rf"\| \[[x ]\] \| {re.escape(entry_id)} \| ⭐+ \| \[([^\]]+)\]"
+    # Find in table: | | B001 | ⭐⭐⭐ | [Title here](#b001) | or | ✅ | B001 | ...
+    pattern = rf"\| [✅ ]* \| {re.escape(entry_id)} \| ⭐+ \| \[([^\]]+)\]"
     match = re.search(pattern, content, re.IGNORECASE)
 
     if match:

@@ -18,7 +18,7 @@ def update_entry(entry_id, field, new_value):
 
     if field == "title":
         # Update title in table row
-        pattern = rf"(\| \[[x ]\] \| {entry_id} \| ⭐+ \| \[)[^\]]+(\]\(#)"
+        pattern = rf"(\| [✅ ]* \| {entry_id} \| ⭐+ \| \[)[^\]]+(\]\(#)"
         replacement = rf"\g<1>{new_value}\g<2>"
         content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
 
@@ -29,7 +29,7 @@ def update_entry(entry_id, field, new_value):
 
     elif field == "priority":
         # Update priority in table row
-        pattern = rf"(\| \[[x ]\] \| {entry_id} \| )⭐+( \|)"
+        pattern = rf"(\| [✅ ]* \| {entry_id} \| )⭐+( \|)"
         replacement = rf"\g<1>{new_value}\g<2>"
         content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
 
@@ -84,7 +84,7 @@ def resort_tables(content):
 def change_category(content, entry_id, new_category):
     """Move an entry from one category table to another."""
     # Find the row in current table (includes Issue column)
-    row_pattern = rf"\| \[[x ]\] \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \| [^\|]* \|\n"
+    row_pattern = rf"\| [✅ ]* \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \| [^\|]* \|\n"
     match = re.search(row_pattern, content, re.IGNORECASE)
 
     if not match:
