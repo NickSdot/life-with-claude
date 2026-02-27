@@ -9,7 +9,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 ## 🤔 Flaws
 | Done | ID | ⭐ | Title | Issue |
 |------|----|----|-------|-------|
-| [ ] | F001 | ⭐⭐ | [Plan mode compacts context too aggressively near completion](#f001) | [#29371](https://github.com/anthropics/claude-code/issues/29371) |
+| | F001 | ⭐⭐ | [Plan mode compacts context too aggressively near completion](#f001) | [#29371](https://github.com/anthropics/claude-code/issues/29371) |
 
 ## 💫 Wishes
 | Done | ID | ⭐ | Title | Issue |
