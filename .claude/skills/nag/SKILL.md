@@ -84,19 +84,27 @@ In `templates/`. To display a template:
 
 - `reference/detail-files.md` — Load when **creating GitHub issues**. MUST use templates from `templates/github.com_anthropics_claude-code/`.
 
-## IDs, Emojis & GitHub Templates
+## IDs & Emojis
 
-| Type | ID prefix | Emoji | GitHub template | Use when |
-|------|-----------|-------|-----------------|----------|
-| Bug | B | 🐛 | `templates/github.com_anthropics_claude-code/bug_report.yml` | Crashes, errors, broken features |
-| Flaw | F | 🤔 | `templates/github.com_anthropics_claude-code/bug_report.yml` | Works but annoying/awkward (still a bug) |
-| Wish | W | 💫 | `templates/github.com_anthropics_claude-code/feature_request.yml` | New features, enhancements |
-
-**Note**: `model_behavior.yml` exists but is ONLY for "Claude said/did unexpected things in conversation" (e.g., modified wrong files, ignored instructions). Most flaws are CLI/infrastructure issues → use bug_report.
+| Type | ID prefix | Emoji | Indicates |
+|------|-----------|-------|-----------|
+| Bug | B | 🐛 | Broken, crash, error, fails |
+| Flaw | F | 🤔 | Annoying, awkward, clunky |
+| Wish | W | 💫 | Would be nice, want, please add |
 
 Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
 
-**IMPORTANT**: When filling GitHub templates, follow the YAML structure EXACTLY. Each template has specific fields (dropdowns, checkboxes, textareas). Read the template file and fill each field according to its type and description.
+## GitHub Templates
+
+Choose template based on **issue content**, not category. All in `templates/github.com_anthropics_claude-code/`:
+
+| Template | Use when |
+|----------|----------|
+| `bug_report.yml` | Crashes, errors, CLI misbehavior, infrastructure issues, things not working as documented |
+| `model_behavior.yml` | Claude (the model) said/did something unexpected in conversation: modified wrong files, ignored instructions, made bad assumptions |
+| `feature_request.yml` | New capabilities, enhancements, "it would be nice if..." |
+
+**IMPORTANT**: Follow the YAML structure EXACTLY. Each template has specific fields (dropdowns, checkboxes, textareas). Read the template and fill EVERY field in `body:` according to its type and description.
 
 ## Lookup (for fin/yay/doh)
 
@@ -128,7 +136,7 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 
 Then:
 1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
-2. Read GitHub template for this category (see "IDs, Emojis & GitHub Templates" table). Fill EVERY field from the YAML `body:` section:
+2. Choose the best GitHub template based on issue content (see "GitHub Templates" table). Fill EVERY field from the YAML `body:` section:
    - `type: dropdown` → pick the most appropriate option
    - `type: checkbox` → mark as checked [x] or unchecked [ ]
    - `type: textarea` → write content matching the placeholder guidance
@@ -154,7 +162,7 @@ Load `reference/detail-files.md`.
 3. `push.sh` → push any pending commits first
 4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
 5. Check if `details/{ID}.md` exists (Read tool)
-6. Read the GitHub template for this category (see "IDs, Emojis & GitHub Templates" table)
+6. Choose the best GitHub template based on issue content (see "GitHub Templates" table)
 7. Build issue body following template's YAML structure
 8. Write body to `$TMPDIR/nag-issue-{ID}.md` (Write tool)
 9. `create-issue.sh "{ID}" "{title}" "$TMPDIR/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
