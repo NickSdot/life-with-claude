@@ -74,7 +74,7 @@ In `templates/`. To display a template:
 
 | File | Placeholders |
 |------|-------------|
-| `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}` |
+| `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}`, `{{GITHUB_ISSUE_BODY}}` (fill from GitHub template for this category) |
 | `status.md` | `{{BUGS}}`, `{{FLAWS}}`, `{{WISHES}}` |
 | `celebration.md` | `{{ID}}`, `{{TITLE}}` |
 | `edit-display.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}` |
@@ -124,11 +124,11 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 
 Then:
 1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
-2. Read `templates/proposal.md`, fill placeholders, output as markdown
-3. **Also show GitHub issue preview**: Read the GitHub template for this category (see "IDs, Emojis & GitHub Templates" table above), fill with entry data, output as "GitHub issue preview:" so user sees exactly what will be filed
+2. Read GitHub template for this category (see "IDs, Emojis & GitHub Templates" table), fill with entry data → this becomes `{{GITHUB_ISSUE_BODY}}`
+3. Read `templates/proposal.md`, fill all placeholders including `{{GITHUB_ISSUE_BODY}}`, output as markdown
 4. Read `questions/confirm.json`, call AskUserQuestion:
    - "Lovely" → continue to step 5
-   - "Hang on" → ask what to change, update values, go back to step 2
+   - "Hang on" → ask what to change, update values, go back to step 3
    - "No" → output "Alright, discarded." and stop
 5. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
 6. `commit.sh "➕ {ID}: {title}" README.md`
