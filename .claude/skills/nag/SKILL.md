@@ -86,13 +86,17 @@ In `templates/`. To display a template:
 
 ## IDs, Emojis & GitHub Templates
 
-| Type | ID prefix | Emoji | GitHub template |
-|------|-----------|-------|-----------------|
-| Bug | B | 🐛 | `templates/github.com_anthropics_claude-code/bug_report.yml` |
-| Flaw | F | 🤔 | `templates/github.com_anthropics_claude-code/model_behavior.yml` |
-| Wish | W | 💫 | `templates/github.com_anthropics_claude-code/feature_request.yml` |
+| Type | ID prefix | Emoji | GitHub template | Use when |
+|------|-----------|-------|-----------------|----------|
+| Bug | B | 🐛 | `templates/github.com_anthropics_claude-code/bug_report.yml` | Crashes, errors, broken features |
+| Flaw | F | 🤔 | `templates/github.com_anthropics_claude-code/bug_report.yml` | Works but annoying/awkward (still a bug) |
+| Wish | W | 💫 | `templates/github.com_anthropics_claude-code/feature_request.yml` | New features, enhancements |
+
+**Note**: `model_behavior.yml` exists but is ONLY for "Claude said/did unexpected things in conversation" (e.g., modified wrong files, ignored instructions). Most flaws are CLI/infrastructure issues → use bug_report.
 
 Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
+
+**IMPORTANT**: When filling GitHub templates, follow the YAML structure EXACTLY. Each template has specific fields (dropdowns, checkboxes, textareas). Read the template file and fill each field according to its type and description.
 
 ## Lookup (for fin/yay/doh)
 
@@ -124,7 +128,12 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 
 Then:
 1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
-2. Read GitHub template for this category (see "IDs, Emojis & GitHub Templates" table), fill with entry data → this becomes `{{GITHUB_ISSUE_BODY}}`
+2. Read GitHub template for this category (see "IDs, Emojis & GitHub Templates" table). Fill EVERY field from the YAML `body:` section:
+   - `type: dropdown` → pick the most appropriate option
+   - `type: checkbox` → mark as checked [x] or unchecked [ ]
+   - `type: textarea` → write content matching the placeholder guidance
+   - `type: input` → provide value (use "Unknown" if not available)
+   Format the filled template as markdown. This becomes `{{GITHUB_ISSUE_BODY}}`
 3. Read `templates/proposal.md`, fill all placeholders including `{{GITHUB_ISSUE_BODY}}`, output as markdown
 4. Read `questions/confirm.json`, call AskUserQuestion:
    - "Lovely" → continue to step 5
