@@ -1,5 +1,6 @@
 {
   "B001": "https://github.com/anthropics/claude-code/issues/27621",
   "F001": "https://github.com/anthropics/claude-code/issues/29371",
-  "F002": "https://github.com/anthropics/claude-code/issues/29780"
+  "F002": "https://github.com/anthropics/claude-code/issues/29780",
+  "F003": "model"
 }

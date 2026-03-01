@@ -12,6 +12,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 |------|----|----|-------|-------|
 | | F001 | ⭐⭐ | [Plan mode compacts context too aggressively near completion](#f001) | [#29371](https://github.com/anthropics/claude-code/issues/29371) |
 | | F002 | ⭐⭐ | [Compaction doesn't start automatically after Claude exhausts context](#f002) | [#29780](https://github.com/anthropics/claude-code/issues/29780) |
+| | F003 | ⭐⭐ | [Task references use invisible IDs instead of visible titles](#f003) | |
 
 ## 💫 Wishes
 | Done | ID | ⭐ | Title | Issue |
@@ -31,3 +32,6 @@ When a Bash command exits with a non-zero status code, the tool result displays 
 **Compaction doesn't start automatically after Claude exhausts context**
 Issue: [#29780](https://github.com/anthropics/claude-code/issues/29780)
 Occasionally, after Claude finishes a longer answer, context sits at 0% but compaction doesn't begin until the next user input—even a simple "yes". If you step away from your desk, you return to find yourself waiting several minutes for compaction that could have already completed in the background.
+### F003
+**Task references use invisible IDs instead of visible titles**
+When using the task list (TodoTool), Claude references tasks like "task 8 ... abc". But the task list I see doesn't display any IDs or numbers—just task titles. This makes it hard to understand which task Claude is talking about. Claude should either reference task titles, or the task list should display the IDs Claude uses.
