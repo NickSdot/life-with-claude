@@ -48,8 +48,9 @@ Accept raw questionnaire answers directly (e.g. "🐛 Bug" → normalized intern
 | `commit.sh "msg" [files]` | Git commit (no push) | — |
 | `push.sh` | Git push | — |
 | `create-issue.sh ID title body-file` | GH issue | `ISSUE_URL:...` |
-| `issues.py get ID` | Get tracked issue URL | URL or exit 1 |
+| `issues.py get ID` | Get tracked issue data | URL, template name, or JSON object |
 | `issues.py set ID url` | Track issue URL | — |
+| `issues.py set ID template body-file` | Track template + approved body | — |
 
 ## Questions
 
@@ -112,6 +113,16 @@ For unknown fields, use "Unknown" or "N/A" rather than omitting.
 | Flaw | F | 🤔 | Annoying, awkward, clunky |
 | Wish | W | 💫 | Would be nice, want, please add |
 
+## GitHub Issue Title Prefixes
+
+Use these exactly as shown (from the GitHub YAML templates):
+
+| Template | Title prefix |
+|----------|--------------|
+| bug | `[BUG] ` |
+| model | `[MODEL] ` |
+| feature | `[FEATURE] ` |
+
 Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
 
 ## Lookup (for fin/yay/doh)
@@ -160,9 +171,10 @@ Then:
    - "Hang on" → ask what to change, update values, go back to step 2
    - "No" → output "Alright, discarded." and stop
 5. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-6. `python3 issues.py set {ID} {template}` → store template choice (e.g. "bug", "model", "feature", or "none")
-7. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json`
-8. **If template is "none":** "Committed locally. This entry won't create a GitHub issue."
+6. Write the approved `{{GITHUB_ISSUE_BODY}}` to `.claude/tmp/nag-body-{ID}.md`
+7. `python3 issues.py set {ID} {template} .claude/tmp/nag-body-{ID}.md` → store template + approved body
+8. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json`
+9. **If template is "none":** "Committed locally. This entry won't create a GitHub issue."
    **Otherwise:** "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
@@ -175,6 +187,7 @@ Load `reference/detail-files.md`.
 2. `python3 issues.py get {ID}` → check stored value:
    - If `"none"` → output "No GitHub issue configured for this entry." and stop
    - If starts with `http` → output "Issue already exists: {url}" and stop
+   - If JSON object with `template` and `body` → use stored body (skip steps 4-7)
    - If template name (`bug`, `model`, `feature`) → continue with that template
    - If not found (exit 1) → ask which template to use
 3. `push.sh` → push any pending commits first
@@ -185,13 +198,16 @@ Load `reference/detail-files.md`.
    - `model` → `templates/github-issue-model.md`
    - `feature` → `templates/github-issue-feature.md`
 7. Fill all `{{PLACEHOLDERS}}` in the template
-8. Write filled template to `.claude/tmp/nag-issue-{ID}.md` (Write tool)
-9. `create-issue.sh "{template}" "{title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
-10. `python3 link-issue.py {ID} {url}` → updates README with issue link
-11. `python3 issues.py set {ID} {url}` → replace template name with actual URL
-12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
-13. `push.sh`
-14. Output the issue URL
+8. Write issue body to `.claude/tmp/nag-issue-{ID}.md`:
+   - If stored value has `body` field → use that directly
+   - Otherwise → use filled template from step 7
+9. Build title with prefix: `[BUG] `, `[MODEL] `, or `[FEATURE] ` + entry title
+10. `create-issue.sh "{template}" "{title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
+11. `python3 link-issue.py {ID} {url}` → updates README with issue link
+12. `python3 issues.py set {ID} {url}` → replace stored data with actual URL
+13. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
+14. `push.sh`
+15. Output the issue URL
 
 ## Workflow: /nag yay <target>
 

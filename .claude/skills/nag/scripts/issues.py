@@ -25,17 +25,20 @@ def save_issues(issues):
 
 
 def get_issue(entry_id):
-    """Get issue URL for an entry."""
+    """Get issue data for an entry. Returns string (URL or template) or dict with template/body."""
     issues = load_issues()
     return issues.get(entry_id.upper())
 
 
-def set_issue(entry_id, url):
-    """Set issue URL for an entry."""
+def set_issue(entry_id, value):
+    """Set issue data for an entry. Value can be URL string or dict with template/body."""
     issues = load_issues()
-    issues[entry_id.upper()] = url
+    issues[entry_id.upper()] = value
     save_issues(issues)
-    print(f"Tracked {entry_id}: {url}")
+    if isinstance(value, dict):
+        print(f"Tracked {entry_id}: {value.get('template', 'unknown')} (with body)")
+    else:
+        print(f"Tracked {entry_id}: {value}")
 
 
 def remove_issue(entry_id):
@@ -69,9 +72,14 @@ if __name__ == "__main__":
 
     elif command == "set":
         if len(sys.argv) < 4:
-            print("Usage: issues.py set <entry-id> <url>")
+            print("Usage: issues.py set <entry-id> <url-or-template> [body-file]")
             sys.exit(1)
-        set_issue(sys.argv[2], sys.argv[3])
+        if len(sys.argv) >= 5:
+            # Body file provided - store as object
+            body = Path(sys.argv[4]).read_text()
+            set_issue(sys.argv[2], {"template": sys.argv[3], "body": body})
+        else:
+            set_issue(sys.argv[2], sys.argv[3])
 
     elif command == "remove":
         if len(sys.argv) < 3:
