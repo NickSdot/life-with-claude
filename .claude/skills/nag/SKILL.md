@@ -2,7 +2,6 @@
 name: nag
 description: Manage Life With Claude feedback (bugs, flaws, wishes). Commands: add, fin, yay, doh.
 argument-hint: "[add|fin|yay|doh] [ID or search]"
-disable-model-invocation: true
 context: fork
 agent: general-purpose
 model: opus
