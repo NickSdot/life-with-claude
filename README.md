@@ -17,6 +17,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 ## 💫 Wishes
 | Done | ID | ⭐ | Title | Issue |
 |------|----|----|-------|-------|
+| | W001 | low | [Add turnDurationOverride setting for custom turn duration messages](#w001) | |
 
 ---
 ## Entry Details
@@ -36,3 +37,6 @@ Occasionally, after Claude finishes a longer answer, context sits at 0% but comp
 **Task references use invisible IDs instead of visible titles**
 Issue: [#29800](https://github.com/anthropics/claude-code/issues/29800)
 When using the task list (TodoTool), Claude references tasks like "task 8 ... abc". But the task list I see doesn't display any IDs or numbers—just task titles. This makes it hard to understand which task Claude is talking about. Claude should either reference task titles, or the task list should display the IDs Claude uses.
+### W001
+**Add turnDurationOverride setting for custom turn duration messages**
+The showTurnDuration setting controls whether the turn duration message appears after responses (e.g., "Cooked for 1m 6s"). Other settings like spinnerTipsEnabled have a companion override setting (spinnerTipsOverride). I'd like to see a turnDurationOverride that lets me customise the turn duration message format. My main use case is including the current date and time (and perhaps the turn start time) alongside the duration, so when I pick up the same session the next day I can see when I left off.
