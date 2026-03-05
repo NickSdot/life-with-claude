@@ -24,14 +24,14 @@ def link_issue(entry_id, issue_url):
     issue_num = issue_match.group(1)
     issue_link = f"[#{issue_num}]({issue_url})"
 
-    # Update table row: | [ ] | B001 | ⭐⭐⭐ | [Title](#b001) | | -> | [ ] | B001 | ⭐⭐⭐ | [Title](#b001) | [#123](url) |
-    row_pattern = rf"(\| [✅ ]* \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \|"
+    # Update table row: | | B001 | ⭐⭐⭐ | [Title](#b001) | | -> | | B001 | ⭐⭐⭐ | [Title](#b001) | [#123](url) |
+    row_pattern = rf"(\|\s*✅?\s*\| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \|"
     row_replacement = rf"\1 {issue_link} |"
     new_content, count = re.subn(row_pattern, row_replacement, content, flags=re.IGNORECASE)
 
     if count == 0:
         # Maybe already has an issue link, try to update it
-        row_pattern = rf"(\| [✅ ]* \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \[#\d+\]\([^\)]+\) \|"
+        row_pattern = rf"(\|\s*✅?\s*\| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \[#\d+\]\([^\)]+\) \|"
         row_replacement = rf"\1 {issue_link} |"
         new_content, count = re.subn(row_pattern, row_replacement, content, flags=re.IGNORECASE)
 
