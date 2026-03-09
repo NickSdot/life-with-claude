@@ -5,7 +5,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 ## 🐛 Bugs
 | Done | ID | ⭐ | Title | Issue |
 |------|----|----|-------|-------|
-| | B001 | ⭐⭐⭐ | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
+| ✅ | B001 | ⭐⭐⭐ | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
 
 ## 🤔 Flaws
 | Done | ID | ⭐ | Title | Issue |

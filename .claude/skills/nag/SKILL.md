@@ -24,12 +24,16 @@ Track issues about Claude Code.
 
 ## Routing
 
-Parse $ARGUMENTS:
-- (no arguments) → stats
-- `add` or `add <text>` → add workflow
-- `fin <target>` → create GitHub issue
-- `yay <target>` → mark done
-- `doh <target>` → edit
+**Command:** $0
+**Target:** $1
+
+| Command | Workflow |
+|---------|----------|
+| (empty) | stats |
+| `add` | add |
+| `fin` | fin |
+| `yay` | yay |
+| `doh` | doh |
 
 ## Scripts
 
