@@ -32,15 +32,15 @@ def parse_readme():
         match = re.search(section_pattern, content)
         if match:
             table_rows = match.group(1)
-            # Pattern captures: done (optional checkbox or empty), id, priority, title, and optional issue link
-            row_pattern = r"\|\s*(\[([x ])\]|)\s*\| ([BFW]\d+) \| (⭐+) \| \[([^\]]+)\]\(#[^\)]+\) \| (?:\[#(\d+)\]\(([^\)]+)\))? \|"
+            # Pattern captures: done (✅ or empty), id, priority, title, and optional issue link
+            row_pattern = r"\|\s*(✅?)\s*\| ([BFW]\d+) \| (⭐+) \| \[([^\]]+)\]\(#[^\)]+\) \| (?:\[#(\d+)\]\(([^\)]+)\))? \|"
             for row_match in re.finditer(row_pattern, table_rows):
-                done = row_match.group(2) == "x"  # group(2) is the x or space inside brackets, None if empty cell
-                entry_id = row_match.group(3)
-                priority = row_match.group(4)
-                title = row_match.group(5)
-                issue_num = row_match.group(6)  # May be None
-                issue_url = row_match.group(7)  # May be None
+                done = row_match.group(1) == "✅"
+                entry_id = row_match.group(2)
+                priority = row_match.group(3)
+                title = row_match.group(4)
+                issue_num = row_match.group(5)  # May be None
+                issue_url = row_match.group(6)  # May be None
 
                 desc_pattern = rf"### {entry_id}\n\*\*[^\*]+\*\*\n(?:Issue: [^\n]+\n)?(.+?)(?=\n###|\n---|\Z)"
                 desc_match = re.search(desc_pattern, content, re.DOTALL)

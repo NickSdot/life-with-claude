@@ -144,17 +144,20 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 
 ## Workflow: /nag add [text]
 
+**MANDATORY**: Always show the proposal (via `templates/proposal.md`) and ask for confirmation (via `questions/confirm.json`) before adding an entry. Never skip the review step, even if the user provides complete information upfront.
+
 **If text provided** (e.g. `/nag add the context window keeps compacting`):
-- Transform user's raw thoughts into a polished entry:
-  - **Category**: Infer from keywords (broken/crash → bug, annoying/awkward → flaw, want/wish → wish)
-  - **Priority**: Infer from severity/frequency mentioned
-  - **Title**: 5-10 words, action-oriented, MUST include key context (e.g., "plan mode" if that's the context). Don't over-generalise—preserve the specific scenario.
-  - **Description**: Capture the full nuance. Include: what happens, when/where it happens, why it's problematic, what would be better. Don't strip detail that helps understand the issue.
+1. Transform user's raw thoughts into a polished entry:
+   - **Category**: Infer from keywords (broken/crash → bug, annoying/awkward → flaw, want/wish → wish)
+   - **Priority**: Infer from severity/frequency mentioned
+   - **Title**: 5-10 words, action-oriented, MUST include key context (e.g., "plan mode" if that's the context). Don't over-generalise—preserve the specific scenario.
+   - **Description**: Capture the full nuance. Include: what happens, when/where it happens, why it's problematic, what would be better. Don't strip detail that helps understand the issue.
+2. Call AskUserQuestion with `questions/add.json` to confirm/adjust category, priority, and select template
 
 **If no text** (just `/nag add`):
 1. Output: "What's the issue?" (wait for user to type description)
 2. User submits description
-3. Immediately call AskUserQuestion with `questions/add.json` (category + priority + template)
+3. Call AskUserQuestion with `questions/add.json` (category + priority + template)
 4. Transform user's description into title + polished description (same rules as text-provided case)
 
 **Template mapping** (from questionnaire answer):
@@ -191,7 +194,7 @@ Load `reference/detail-files.md`.
 2. `python3 issues.py get {ID}` → check stored value:
    - If `"none"` → output "No GitHub issue configured for this entry." and stop
    - If starts with `http` → output "Issue already exists: {url}" and stop
-   - If JSON object with `template` and `body` → use stored body (skip steps 4-7)
+   - If JSON object with `template` and `body` → use stored body (skip steps 5-7)
    - If template name (`bug`, `model`, `feature`) → continue with that template
    - If not found (exit 1) → ask which template to use
 3. `push.sh` → push any pending commits first
@@ -205,13 +208,12 @@ Load `reference/detail-files.md`.
 8. Write issue body to `.claude/tmp/nag-issue-{ID}.md`:
    - If stored value has `body` field → use that directly
    - Otherwise → use filled template from step 7
-9. Build title with prefix: `[BUG] `, `[MODEL] `, or `[FEATURE] ` + entry title
-10. `create-issue.sh "{template}" "{title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output
-11. `python3 link-issue.py {ID} {url}` → updates README with issue link
-12. `python3 issues.py set {ID} {url}` → replace stored data with actual URL
-13. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
-14. `push.sh`
-15. Output the issue URL
+9. `create-issue.sh "{template}" "{entry_title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output (script adds the prefix automatically)
+10. `python3 link-issue.py {ID} {url}` → updates README with issue link
+11. `python3 issues.py set {ID} {url}` → replace stored data with actual URL
+12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
+13. `push.sh`
+14. Output the issue URL
 
 ## Workflow: /nag yay <target>
 
