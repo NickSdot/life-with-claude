@@ -24,8 +24,8 @@ Track issues about Claude Code.
 
 ## Routing
 
-Parse `$ARGUMENTS`:
-- Empty → stats
+Parse $ARGUMENTS:
+- (no arguments) → stats
 - `add` or `add <text>` → add workflow
 - `fin <target>` → create GitHub issue
 - `yay <target>` → mark done
