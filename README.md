@@ -6,7 +6,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 | Done | ID | ⭐ | Title | Issue |
 |------|----|----|-------|-------|
 | ✅ | B001 | ⭐⭐⭐ | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
-| | B002 | ⭐⭐ | [Unsupported model in agent config silently fails instead of erroring](#b002) | |
+| | B002 | ⭐⭐ | [Unsupported model in agent config silently fails instead of erroring](#b002) | [#32415](https://github.com/anthropics/claude-code/issues/32415) |
 
 ## 🤔 Flaws
 | Done | ID | ⭐ | Title | Issue |
@@ -44,4 +44,5 @@ Issue: [#30979](https://github.com/anthropics/claude-code/issues/30979)
 The showTurnDuration setting controls whether the turn duration message appears after responses (e.g., "Cooked for 1m 6s"). Other settings like spinnerTipsEnabled have a companion override setting (spinnerTipsOverride). I'd like to see a turnDurationOverride that lets me customise the turn duration message format. My main use case is including the current date and time (and perhaps the turn start time) alongside the duration, so when I pick up the same session the next day I can see when I left off.
 ### B002
 **Unsupported model in agent config silently fails instead of erroring**
+Issue: [#32415](https://github.com/anthropics/claude-code/issues/32415)
 When I specify a model like `claude-opus-4-5` in agent configuration (frontmatter or `--agents` flag), it silently fails instead of erroring—even though that same model name works with `--model`. Two failure modes: (1) frontmatter agents silently fall back to the main agent's config, burning unexpected tokens; (2) `--agents` flag agents with unsupported models simply don't register, leaving the main agent confused about what agents exist.
