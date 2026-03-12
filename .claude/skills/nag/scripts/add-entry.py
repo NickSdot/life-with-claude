@@ -10,29 +10,32 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from bootstrap import (
     README_PATH,
-    CATEGORY_HEADERS,
+    CATEGORY_EMOJI,
     normalize_category,
     normalize_priority,
 )
 
+TABLE_HEADER = "| Type | ID | ⭐ | Title | Issue |"
+TABLE_SEPARATOR = "|------|----|----|-------|-------|"
+
 
 def add_entry(entry_id, category, priority, title, description):
-    """Add a new entry to README.md in the correct position."""
+    """Add a new entry to the Open section of README.md."""
     content = README_PATH.read_text()
 
-    section_header = CATEGORY_HEADERS[category]
+    emoji = CATEGORY_EMOJI[category]
     priority_num = len(priority)
 
-    # Create the new table row (empty Done and Issue columns)
+    # Create the new table row
     anchor = entry_id.lower()
-    new_row = f"| | {entry_id} | {priority} | [{title}](#{anchor}) | |"
+    new_row = f"| {emoji} | {entry_id} | {priority} | [{title}](#{anchor}) | |"
 
-    # Find the section and its table
-    section_pattern = rf"({re.escape(section_header)}\n\| Done \| ID \| ⭐ \| Title \| Issue \|\n\|------\|----\|----\|-------\|-------\|)\n((?:\|[^\n]*\n)*)"
+    # Find the Open section table
+    section_pattern = rf"(## Open\n\n{re.escape(TABLE_HEADER)}\n{re.escape(TABLE_SEPARATOR)})\n((?:\|[^\n]*\n)*)"
     match = re.search(section_pattern, content)
 
     if not match:
-        print(f"Error: Could not find section {section_header}")
+        print("Error: Could not find Open section")
         sys.exit(1)
 
     table_header = match.group(1)
@@ -58,13 +61,15 @@ def add_entry(entry_id, category, priority, title, description):
     new_section = f"{table_header}\n{sorted_rows}"
     content = content[:match.start()] + new_section + content[match.end():]
 
-    # Add entry details at the end
-    details_section = f"\n### {entry_id}\n**{title}**\n{description}\n"
+    # Add entry details before the Done section
+    details_entry = f"\n### {entry_id}\n**{title}**\n{description}\n"
 
-    if "## Entry Details" in content:
-        content = content.rstrip() + details_section
+    # Insert before ## Done
+    done_match = re.search(r"\n## Done\n", content)
+    if done_match:
+        content = content[:done_match.start()] + details_entry + content[done_match.start():]
     else:
-        content = content.rstrip() + "\n\n---\n## Entry Details" + details_section
+        content = content.rstrip() + details_entry
 
     README_PATH.write_text(content)
     print(f"Added {entry_id}: {title}")

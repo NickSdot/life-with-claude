@@ -31,17 +31,13 @@ PRIORITY_MAP = {
     "⭐": "⭐",
 }
 
-CATEGORY_HEADERS = {
-    "bug": "## 🐛 Bugs",
-    "flaw": "## 🤔 Flaws",
-    "wish": "## 💫 Wishes",
-}
-
 CATEGORY_EMOJI = {
     "bug": "🐛",
     "flaw": "🤔",
     "wish": "💫",
 }
+
+EMOJI_CATEGORY = {v: k for k, v in CATEGORY_EMOJI.items()}
 
 ID_PREFIX = {
     "bug": "B",

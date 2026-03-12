@@ -15,7 +15,7 @@ def link_issue(entry_id, issue_url):
     content = README_PATH.read_text()
     entry_id = entry_id.upper()
 
-    # Extract issue number from URL (e.g., https://github.com/anthropics/claude-code/issues/123 -> #123)
+    # Extract issue number from URL
     issue_match = re.search(r'/issues/(\d+)', issue_url)
     if not issue_match:
         print(f"Invalid issue URL: {issue_url}")
@@ -24,14 +24,14 @@ def link_issue(entry_id, issue_url):
     issue_num = issue_match.group(1)
     issue_link = f"[#{issue_num}]({issue_url})"
 
-    # Update table row: | | B001 | ⭐⭐⭐ | [Title](#b001) | | -> | | B001 | ⭐⭐⭐ | [Title](#b001) | [#123](url) |
-    row_pattern = rf"(\|\s*✅?\s*\| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \|"
+    # Update table row: | 🐛 | B001 | ⭐⭐⭐ | [Title](#b001) | | -> ... | [#123](url) |
+    row_pattern = rf"(\| [🐛🤔💫] \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \|"
     row_replacement = rf"\1 {issue_link} |"
     new_content, count = re.subn(row_pattern, row_replacement, content, flags=re.IGNORECASE)
 
     if count == 0:
         # Maybe already has an issue link, try to update it
-        row_pattern = rf"(\|\s*✅?\s*\| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \[#\d+\]\([^\)]+\) \|"
+        row_pattern = rf"(\| [🐛🤔💫] \| {entry_id} \| ⭐+ \| \[[^\]]+\]\(#[^\)]+\) \|) \[#\d+\]\([^\)]+\) \|"
         row_replacement = rf"\1 {issue_link} |"
         new_content, count = re.subn(row_pattern, row_replacement, content, flags=re.IGNORECASE)
 
