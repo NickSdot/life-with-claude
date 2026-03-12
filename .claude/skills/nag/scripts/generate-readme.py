@@ -7,13 +7,8 @@ from pathlib import Path
 
 # Add script directory to path for bootstrap
 sys.path.insert(0, str(Path(__file__).parent))
-from bootstrap import (
-    README_PATH,
-    HEADER_PATH,
-    CATEGORIES,
-    PRIORITIES,
-    load_entries,
-)
+from bootstrap import README_PATH, HEADER_PATH, CATEGORIES, PRIORITIES
+from entries import load
 
 TABLE_HEADER = "| Type | ID | Prio | Title | Issue |"
 TABLE_SEPARATOR = "|------|----|----|-------|-------|"
@@ -76,7 +71,7 @@ def render_section(title, entries):
 def generate():
     """Generate README.md from header + entries."""
     header = HEADER_PATH.read_text().rstrip()
-    entries = load_entries()
+    entries = load()
 
     open_entries = [e for e in entries if not e["done"]]
     done_entries = [e for e in entries if e["done"]]

@@ -5,9 +5,7 @@ Loads constants, provides normalization maps, runs daily maintenance.
 Import this module to access paths, maps, and trigger daily checks.
 """
 
-import json
 import subprocess
-import sys
 from datetime import date
 from pathlib import Path
 
@@ -93,36 +91,6 @@ TEMPLATES_DIR = Path(_CONSTANTS["LWC_TEMPLATES_DIR"])
 GH_TEMPLATES_DIR = Path(_CONSTANTS["LWC_GH_TEMPLATES_DIR"])
 
 
-# === JSON Helpers ===
-
-def load_entries():
-    """Load entries from entries.json."""
-    if not ENTRIES_PATH.exists():
-        return []
-    data = json.loads(ENTRIES_PATH.read_text())
-    return data.get("entries", [])
-
-
-def save_entries(entries):
-    """Save entries to entries.json."""
-    ENTRIES_PATH.write_text(json.dumps({"entries": entries}, indent=2) + "\n")
-
-
-def find_entry(entries, entry_id):
-    """Find an entry by ID (case-insensitive). Returns (index, entry) or (None, None)."""
-    entry_id = entry_id.upper()
-    for i, e in enumerate(entries):
-        if e["id"].upper() == entry_id:
-            return i, e
-    return None, None
-
-
-def regenerate_readme():
-    """Call generate-readme.py to rebuild README.md from JSON."""
-    subprocess.run(
-        [sys.executable, str(SCRIPTS_DIR / "generate-readme.py")],
-        check=True
-    )
 
 
 # === Daily Maintenance ===
