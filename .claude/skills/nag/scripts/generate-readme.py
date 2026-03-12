@@ -45,7 +45,7 @@ def render_section(title, entries):
     by_prio = sorted(entries, key=lambda e: PRIORITIES[e["priority"]]["sort"], reverse=True)
     rows = [render_row(e) for e in by_prio]
     details = [render_detail(e) for e in by_prio]
-    return "\n".join([f"## {title}", "", TABLE_HEADER, TABLE_SEPARATOR] + rows + [""] + details)
+    return "\n".join([f"## {title}", "", TABLE_HEADER, TABLE_SEPARATOR] + rows) + "\n\n" + "\n\n".join(details)
 
 
 if __name__ == "__main__":

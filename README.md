@@ -19,18 +19,22 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 **--agents flag agents invisible to Claude despite appearing in /agents**
 Issue: [#33513](https://github.com/anthropics/claude-code/issues/33513)
 When I launch Claude Code with --agents to define agents programmatically, Claude cannot find or spawn them when asked. However, the same agents appear correctly in the /agents list under CLI arg agents. No workarounds.
+
 ### F001
 **Plan mode compacts context too aggressively near completion**
 Issue: [#29371](https://github.com/anthropics/claude-code/issues/29371)
 Plan mode triggers context compaction at around 166k tokens, even when the agent is about to finish—for example, right after receiving feedback from the plan agent. At that point the bulk of context is already present and finishing the plan should be straightforward. When compaction happens immediately after receiving sub-agent responses, the agent sometimes forgets that feedback entirely and starts the planning process over. Compaction in plan mode should be more context-aware and graceful, considering how close the agent is to completion.
+
 ### F002
 **Compaction doesn't start automatically after Claude exhausts context**
 Issue: [#29780](https://github.com/anthropics/claude-code/issues/29780)
 Occasionally, after Claude finishes a longer answer, context sits at 0% but compaction doesn't begin until the next user input—even a simple "yes". If you step away from your desk, you return to find yourself waiting several minutes for compaction that could have already completed in the background.
+
 ### F003
 **Task references use invisible IDs instead of visible titles**
 Issue: [#29800](https://github.com/anthropics/claude-code/issues/29800)
 When using the task list (TodoTool), Claude references tasks like "task 8 ... abc". But the task list I see doesn't display any IDs or numbers—just task titles. This makes it hard to understand which task Claude is talking about. Claude should either reference task titles, or the task list should display the IDs Claude uses.
+
 ### W001
 **Add turnDurationOverride setting for custom turn duration messages**
 Issue: [#30979](https://github.com/anthropics/claude-code/issues/30979)
@@ -47,6 +51,7 @@ The showTurnDuration setting controls whether the turn duration message appears 
 **Bash tool duplicates output for failed commands**
 Issue: [#27621](https://github.com/anthropics/claude-code/issues/27621)
 When a Bash command exits with a non-zero status code, the tool result displays all output twice—doubling token consumption. Successful commands (exit 0) display correctly. This affects verbose compiler errors, test failures, and any command that fails, potentially adding thousands of unnecessary tokens to context. The duplication appears in the error block and is identical (not interleaved).
+
 ### B002
 **Unsupported model in agent config silently fails instead of erroring**
 Issue: [#32415](https://github.com/anthropics/claude-code/issues/32415)
