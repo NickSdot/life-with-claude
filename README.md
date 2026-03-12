@@ -7,7 +7,7 @@ Working with Claude Code is rather brilliant. This repository is where I keep co
 |------|----|----|-------|-------|
 | ✅ | B001 | ⭐⭐⭐ | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
 | | B002 | ⭐⭐ | [Unsupported model in agent config silently fails instead of erroring](#b002) | [#32415](https://github.com/anthropics/claude-code/issues/32415) |
-| | B003 | ⭐⭐ | [--agents flag agents invisible to Claude despite appearing in /agents](#b003) | |
+| | B003 | ⭐⭐ | [--agents flag agents invisible to Claude despite appearing in /agents](#b003) | [#33513](https://github.com/anthropics/claude-code/issues/33513) |
 
 ## 🤔 Flaws
 | Done | ID | ⭐ | Title | Issue |
@@ -49,4 +49,5 @@ Issue: [#32415](https://github.com/anthropics/claude-code/issues/32415)
 When I specify a model like `claude-opus-4-5` in agent configuration (frontmatter or `--agents` flag), it silently fails instead of erroring—even though that same model name works with `--model`. Two failure modes: (1) frontmatter agents silently fall back to the main agent's config, burning unexpected tokens; (2) `--agents` flag agents with unsupported models simply don't register, leaving the main agent confused about what agents exist.
 ### B003
 **--agents flag agents invisible to Claude despite appearing in /agents**
+Issue: [#33513](https://github.com/anthropics/claude-code/issues/33513)
 When I launch Claude Code with --agents to define agents programmatically, Claude cannot find or spawn them when asked. However, the same agents appear correctly in the /agents list under CLI arg agents. No workarounds.
