@@ -34,11 +34,11 @@ def render_row(entry):
 
 def render_detail(entry):
     """Render a detail section for an entry."""
-    heading = f"### {entry['id']}: {entry['title']}"
+    lines = [f"### {entry['id']}: {entry['title']}", entry["description"]]
     link = issue_link(entry.get("issue_url"))
     if link:
-        heading += f" ({link})"
-    return f"{heading}\n{entry['description']}"
+        lines.append(f"Issue: {link}")
+    return "\n".join(lines)
 
 
 def render_section(title, entries):
