@@ -5,7 +5,9 @@ Loads constants, provides normalization maps, runs daily maintenance.
 Import this module to access paths, maps, and trigger daily checks.
 """
 
+import json
 import subprocess
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -23,33 +25,27 @@ CATEGORY_MAP = {
 }
 
 PRIORITY_MAP = {
-    "⭐⭐⭐ High": "⭐⭐⭐",
-    "⭐⭐ Medium": "⭐⭐",
-    "⭐ Low": "⭐",
-    "⭐⭐⭐": "⭐⭐⭐",
-    "⭐⭐": "⭐⭐",
-    "⭐": "⭐",
+    "🔴 High": "high",
+    "🟡 Medium": "medium",
+    "🟢 Low": "low",
+    "high": "high",
+    "medium": "medium",
+    "low": "low",
 }
 
-CATEGORY_EMOJI = {
-    "bug": "🐛",
-    "flaw": "🤔",
-    "wish": "💫",
+CATEGORIES = {
+    "bug":  {"emoji": "🐛", "prefix": "B", "gh_template": "bug_report.yml"},
+    "flaw": {"emoji": "🤔", "prefix": "F", "gh_template": "model_behavior.yml"},
+    "wish": {"emoji": "💫", "prefix": "W", "gh_template": "feature_request.yml"},
 }
 
-EMOJI_CATEGORY = {v: k for k, v in CATEGORY_EMOJI.items()}
-
-ID_PREFIX = {
-    "bug": "B",
-    "flaw": "F",
-    "wish": "W",
+PRIORITIES = {
+    "high":   {"emoji": "🔴", "sort": 3},
+    "medium": {"emoji": "🟡", "sort": 2},
+    "low":    {"emoji": "🟢", "sort": 1},
 }
 
-GH_ISSUE_TEMPLATE = {
-    "bug": "bug_report.yml",
-    "flaw": "model_behavior.yml",
-    "wish": "feature_request.yml",
-}
+EMOJI_CATEGORY = {v["emoji"]: k for k, v in CATEGORIES.items()}
 
 
 def normalize_category(raw):
@@ -79,6 +75,7 @@ def _load_constants():
             value = value.replace("$LWC_REPO", constants.get("LWC_REPO", ""))
             value = value.replace("$LWC_SKILL_DIR", constants.get("LWC_SKILL_DIR", ""))
             value = value.replace("$LWC_TEMPLATES_DIR", constants.get("LWC_TEMPLATES_DIR", ""))
+            value = value.replace("$LWC_DETAILS_DIR", constants.get("LWC_DETAILS_DIR", ""))
             constants[key] = value
     return constants
 
@@ -89,9 +86,43 @@ WISHLIST_REPO = _CONSTANTS["LWC_REPO"]
 SKILL_DIR = _CONSTANTS["LWC_SKILL_DIR"]
 README_PATH = Path(_CONSTANTS["LWC_README_PATH"])
 DETAILS_DIR = Path(_CONSTANTS["LWC_DETAILS_DIR"])
+ENTRIES_PATH = Path(_CONSTANTS["LWC_ENTRIES_PATH"])
+HEADER_PATH = Path(_CONSTANTS["LWC_HEADER_PATH"])
 SCRIPTS_DIR = Path(_CONSTANTS["LWC_SCRIPTS_DIR"])
 TEMPLATES_DIR = Path(_CONSTANTS["LWC_TEMPLATES_DIR"])
 GH_TEMPLATES_DIR = Path(_CONSTANTS["LWC_GH_TEMPLATES_DIR"])
+
+
+# === JSON Helpers ===
+
+def load_entries():
+    """Load entries from entries.json."""
+    if not ENTRIES_PATH.exists():
+        return []
+    data = json.loads(ENTRIES_PATH.read_text())
+    return data.get("entries", [])
+
+
+def save_entries(entries):
+    """Save entries to entries.json."""
+    ENTRIES_PATH.write_text(json.dumps({"entries": entries}, indent=2) + "\n")
+
+
+def find_entry(entries, entry_id):
+    """Find an entry by ID (case-insensitive). Returns (index, entry) or (None, None)."""
+    entry_id = entry_id.upper()
+    for i, e in enumerate(entries):
+        if e["id"].upper() == entry_id:
+            return i, e
+    return None, None
+
+
+def regenerate_readme():
+    """Call generate-readme.py to rebuild README.md from JSON."""
+    subprocess.run(
+        [sys.executable, str(SCRIPTS_DIR / "generate-readme.py")],
+        check=True
+    )
 
 
 # === Daily Maintenance ===
