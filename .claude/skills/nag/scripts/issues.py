@@ -7,9 +7,9 @@ from pathlib import Path
 
 # Add script directory to path for bootstrap
 sys.path.insert(0, str(Path(__file__).parent))
-from bootstrap import SKILL_DIR
+from bootstrap import DETAILS_DIR
 
-ISSUES_PATH = Path(SKILL_DIR) / "issues.json"
+ISSUES_PATH = DETAILS_DIR / "issues.json"
 
 
 def load_issues():
@@ -25,20 +25,17 @@ def save_issues(issues):
 
 
 def get_issue(entry_id):
-    """Get issue data for an entry. Returns string (URL or template) or dict with template/body."""
+    """Get issue URL or 'none' for an entry."""
     issues = load_issues()
     return issues.get(entry_id.upper())
 
 
 def set_issue(entry_id, value):
-    """Set issue data for an entry. Value can be URL string or dict with template/body."""
+    """Set issue URL or 'none' for an entry."""
     issues = load_issues()
     issues[entry_id.upper()] = value
     save_issues(issues)
-    if isinstance(value, dict):
-        print(f"Tracked {entry_id}: {value.get('template', 'unknown')} (with body)")
-    else:
-        print(f"Tracked {entry_id}: {value}")
+    print(f"Tracked {entry_id}: {value}")
 
 
 def remove_issue(entry_id):
@@ -72,14 +69,9 @@ if __name__ == "__main__":
 
     elif command == "set":
         if len(sys.argv) < 4:
-            print("Usage: issues.py set <entry-id> <url-or-template> [body-file]")
+            print("Usage: issues.py set <entry-id> <url-or-'none'>")
             sys.exit(1)
-        if len(sys.argv) >= 5:
-            # Body file provided - store as object
-            body = Path(sys.argv[4]).read_text()
-            set_issue(sys.argv[2], {"template": sys.argv[3], "body": body})
-        else:
-            set_issue(sys.argv[2], sys.argv[3])
+        set_issue(sys.argv[2], sys.argv[3])
 
     elif command == "remove":
         if len(sys.argv) < 3:

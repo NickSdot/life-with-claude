@@ -52,9 +52,8 @@ Accept raw questionnaire answers directly (e.g. "🐛 Bug" → normalized intern
 | `commit.sh "msg" [files]` | Git commit (no push) | — |
 | `push.sh` | Git push | — |
 | `create-issue.sh ID title body-file` | GH issue | `ISSUE_URL:...` |
-| `issues.py get ID` | Get tracked issue data | URL, template name, or JSON object |
-| `issues.py set ID url` | Track issue URL | — |
-| `issues.py set ID template body-file` | Track template + approved body | — |
+| `issues.py get ID` | Get tracked issue URL | URL or "none" |
+| `issues.py set ID url` | Track issue URL or "none" | — |
 
 ## Questions
 
@@ -178,12 +177,12 @@ Then:
    - "Hang on" → ask what to change, update values, go back to step 2
    - "No" → output "Alright, discarded." and stop
 5. **If template is NOT "none":** create the GitHub issue now:
-   - Write the approved `{{GITHUB_ISSUE_BODY}}` to `details/nag-body-{ID}.md`
-   - `create-issue.sh "{template}" "{entry_title}" "details/nag-body-{ID}.md"` → parse `ISSUE_URL:` from output
+   - Write the approved `{{GITHUB_ISSUE_BODY}}` to `details/{ID}.md`
+   - `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:` from output
 6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
 7. **If issue was created:** `python3 link-issue.py {ID} {url}` → adds issue link to README entry
 8. `python3 issues.py set {ID} {url_or_"none"}` → track URL or "none"
-9. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json details/`
+9. `commit.sh "➕ {ID}: {title}" README.md details/issues.json details/`
 10. `push.sh`
 11. **If template is "none":** "Done. This entry won't create a GitHub issue."
     **Otherwise:** Output the issue URL.
@@ -201,11 +200,11 @@ Creates a GitHub issue for entries that were added without one (template "none" 
 3. Ask which template to use (AskUserQuestion with template options from `questions/add.json`, template question only)
 4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
 5. Read the chosen template file, fill all `{{PLACEHOLDERS}}`
-6. Write issue body to `details/nag-body-{ID}.md`
-7. `create-issue.sh "{template}" "{entry_title}" "details/nag-body-{ID}.md"` → parse `ISSUE_URL:`
+6. Write issue body to `details/{ID}.md`
+7. `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:`
 8. `python3 link-issue.py {ID} {url}` → updates README with issue link
 9. `python3 issues.py set {ID} {url}` → replace stored data with URL
-10. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json details/`
+10. `commit.sh "📤 {ID}: Created issue" README.md details/issues.json details/`
 11. `push.sh`
 12. Output the issue URL
 
