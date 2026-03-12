@@ -27,7 +27,7 @@ if __name__ == "__main__":
             "title": data["title"],
             "description": data["description"],
             "done": False,
-            "issue_url": None,
+            "issue_url": data.get("issue_url"),
         })
         save_and_regenerate(entries)
         print(f"Added {data['id']}: {data['title']}")

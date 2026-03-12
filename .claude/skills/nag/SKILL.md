@@ -180,11 +180,11 @@ Then:
 5. **If template is NOT "none":** create the GitHub issue now:
    - Write the approved `{{GITHUB_ISSUE_BODY}}` to `details/{ID}.md`
    - `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:` from output
-6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-7. **If issue was created:** `python3 link-issue.py {ID} {url}`
-8. `commit.sh "➕ {ID}: {title}" README.md details/`
-9. `push.sh`
-10. **If template is "none":** "Done. This entry won't create a GitHub issue."
+6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"...","issue_url":"..."}'`
+   - Include `"issue_url"` only if an issue was created; omit it otherwise
+7. `commit.sh "➕ {ID}: {title}" README.md details/`
+8. `push.sh`
+9. **If template is "none":** "Done. This entry won't create a GitHub issue."
     **Otherwise:** Output the issue URL.
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
