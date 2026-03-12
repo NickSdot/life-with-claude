@@ -31,7 +31,7 @@ def find(entries, entry_id):
 def load_and_find(entry_id):
     """Load entries and find one by ID. Exits with error if not found."""
     entries = load()
-    idx, entry = find(entries, entry_id.upper())
+    idx, entry = find(entries, entry_id)
     if idx is None:
         print(f"Entry {entry_id} not found")
         sys.exit(1)
