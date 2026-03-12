@@ -34,7 +34,7 @@ def render_row(entry):
 
 def render_detail(entry):
     """Render a detail section for an entry."""
-    heading = f"### {entry['id']}: `{entry['title']}`"
+    heading = f"### {entry['id']}: {entry['title']}"
     link = issue_link(entry.get("issue_url"))
     if link:
         heading += f" — {link}"
