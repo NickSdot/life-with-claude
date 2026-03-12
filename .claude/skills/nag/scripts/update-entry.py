@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from bootstrap import CATEGORIES, PRIORITIES, normalize_category, normalize_priority
+from bootstrap import CATEGORIES, normalize_category, normalize_priority
 from entries import load_and_find, save_and_regenerate
 
 if __name__ == "__main__":
@@ -19,9 +19,6 @@ if __name__ == "__main__":
 
     if field == "category":
         new_value = normalize_category(new_value)
-        if new_value not in CATEGORIES:
-            print(f"Invalid category: {new_value}")
-            sys.exit(1)
         new_prefix = CATEGORIES[new_value]["prefix"]
         new_id = new_prefix + entry["id"][1:]
         if any(e["id"] == new_id for e in entries if e is not entry):
@@ -30,11 +27,7 @@ if __name__ == "__main__":
         entries[idx]["id"] = new_id
         entries[idx]["category"] = new_value
     elif field == "priority":
-        new_value = normalize_priority(new_value)
-        if new_value not in PRIORITIES:
-            print(f"Invalid priority: {new_value}")
-            sys.exit(1)
-        entries[idx]["priority"] = new_value
+        entries[idx]["priority"] = normalize_priority(new_value)
     elif field in ("title", "description", "issue_url"):
         entries[idx][field] = new_value
     else:

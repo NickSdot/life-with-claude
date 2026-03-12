@@ -8,7 +8,7 @@ from pathlib import Path
 
 # Add script directory to path for bootstrap
 sys.path.insert(0, str(Path(__file__).parent))
-from bootstrap import ENTRIES_PATH, SCRIPTS_DIR
+from bootstrap import ENTRIES_PATH, SCRIPTS_DIR, CATEGORIES, PRIORITIES
 
 
 def load():
@@ -38,8 +38,20 @@ def load_and_find(entry_id):
     return entries, idx, entry
 
 
+def validate(entry):
+    """Validate an entry's category and priority. Exits on invalid values."""
+    if entry["category"] not in CATEGORIES:
+        print(f"Invalid category: {entry['category']}")
+        sys.exit(1)
+    if entry["priority"] not in PRIORITIES:
+        print(f"Invalid priority: {entry['priority']}")
+        sys.exit(1)
+
+
 def save_and_regenerate(entries):
-    """Save entries to JSON and regenerate README."""
+    """Validate all entries, save to JSON, and regenerate README."""
+    for entry in entries:
+        validate(entry)
     ENTRIES_PATH.write_text(json.dumps({"entries": entries}, indent=2) + "\n")
     subprocess.run(
         [sys.executable, str(SCRIPTS_DIR / "generate-readme.py")],
