@@ -37,7 +37,7 @@ def normalize_category(raw):
 
 def normalize_priority(raw):
     """Normalize priority from raw input."""
-    return _PRIORITY_MAP.get(raw, raw)
+    return _PRIORITY_MAP.get(raw, raw.lower() if isinstance(raw, str) else raw)
 
 
 # === Path Constants (loaded from constants.sh, shared with shell scripts) ===
