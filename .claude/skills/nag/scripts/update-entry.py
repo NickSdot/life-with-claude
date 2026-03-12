@@ -25,7 +25,7 @@ if __name__ == "__main__":
             sys.exit(1)
         entries[idx]["id"] = new_id
         entries[idx]["category"] = new_value
-    elif field in ("title", "priority", "description"):
+    elif field in ("title", "priority", "description", "issue_url"):
         entries[idx][field] = new_value
     else:
         print(f"Unknown field: {field}")

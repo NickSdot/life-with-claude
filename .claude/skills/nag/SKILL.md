@@ -49,8 +49,7 @@ All mutation scripts update `entries.json` and regenerate `README.md` automatica
 | `query.py get ID` | Get single entry | JSON object (includes `issue_url`) |
 | `add-entry.py '<json>'` | Add entry (accepts raw answers) | Confirms |
 | `mark-done.py ID` | Mark done | `TITLE:...` |
-| `update-entry.py ID field value` | Edit | Confirms |
-| `link-issue.py ID url` | Set `issue_url` on entry | Confirms |
+| `update-entry.py ID field value` | Edit (title, priority, description, issue_url, category) | Confirms |
 | `generate-readme.py` | Regenerate README from JSON | — |
 | `commit.sh "msg" [files]` | Git commit (no push) | — |
 | `push.sh` | Git push | — |
@@ -201,7 +200,7 @@ Creates a GitHub issue for entries that were added without one (template "none" 
 4. Read the chosen template file, fill all `{{PLACEHOLDERS}}`
 5. Write issue body to `details/{ID}.md`
 6. `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:`
-7. `python3 link-issue.py {ID} {url}`
+7. `python3 update-entry.py {ID} issue_url {url}`
 8. `commit.sh "📤 {ID}: Created issue" README.md details/`
 9. `push.sh`
 10. Output the issue URL
