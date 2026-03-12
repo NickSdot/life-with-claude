@@ -25,19 +25,20 @@ def render_row(entry):
     """Render a single table row."""
     emoji = CATEGORIES[entry["category"]]["emoji"]
     prio = PRIORITIES[entry["priority"]]["emoji"]
-    title = f"[{entry['title']}](#{entry['id'].lower()})"
+    slug = f"{entry['id']}-{entry['title']}".lower().replace(" ", "-")
+    slug = re.sub(r'[^a-z0-9-]', '', slug)
+    title = f"[{entry['title']}](#{slug})"
     issue = issue_link(entry.get("issue_url"))
     return f"| {emoji} | {entry['id']} | {prio} | {title} | {issue} |"
 
 
 def render_detail(entry):
     """Render a detail section for an entry."""
-    lines = [f"### {entry['id']}", f"**{entry['title']}**"]
+    heading = f"### {entry['id']}: `{entry['title']}`"
     link = issue_link(entry.get("issue_url"))
     if link:
-        lines.append(f"Issue: {link}")
-    lines.append(entry["description"])
-    return "\n".join(lines)
+        heading += f" — {link}"
+    return f"{heading}\n{entry['description']}"
 
 
 def render_section(title, entries):
