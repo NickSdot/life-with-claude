@@ -37,7 +37,7 @@ def render_detail(entry):
     heading = f"### {entry['id']}: {entry['title']}"
     link = issue_link(entry.get("issue_url"))
     if link:
-        heading += f" — {link}"
+        heading += f" ({link})"
     return f"{heading}\n{entry['description']}"
 
 
