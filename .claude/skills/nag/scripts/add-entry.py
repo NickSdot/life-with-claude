@@ -8,7 +8,7 @@ from pathlib import Path
 # Add script directory to path for bootstrap
 sys.path.insert(0, str(Path(__file__).parent))
 from bootstrap import normalize_category, normalize_priority
-from entries import load, save, regenerate_readme
+from entries import load, save_and_regenerate
 
 
 def add_entry(entry_id, category, priority, title, description):
@@ -23,8 +23,7 @@ def add_entry(entry_id, category, priority, title, description):
         "done": False,
         "issue_url": None,
     })
-    save(entries)
-    regenerate_readme()
+    save_and_regenerate(entries)
     print(f"Added {entry_id}: {title}")
 
 

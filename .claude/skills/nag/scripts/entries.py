@@ -19,11 +19,6 @@ def load():
     return data.get("entries", [])
 
 
-def save(entries):
-    """Save entries to entries.json."""
-    ENTRIES_PATH.write_text(json.dumps({"entries": entries}, indent=2) + "\n")
-
-
 def find(entries, entry_id):
     """Find an entry by ID (case-insensitive). Returns (index, entry) or (None, None)."""
     entry_id = entry_id.upper()
@@ -33,8 +28,19 @@ def find(entries, entry_id):
     return None, None
 
 
-def regenerate_readme():
-    """Call generate-readme.py to rebuild README.md from JSON."""
+def load_and_find(entry_id):
+    """Load entries and find one by ID. Exits with error if not found."""
+    entries = load()
+    idx, entry = find(entries, entry_id.upper())
+    if idx is None:
+        print(f"Entry {entry_id} not found")
+        sys.exit(1)
+    return entries, idx, entry
+
+
+def save_and_regenerate(entries):
+    """Save entries to JSON and regenerate README."""
+    ENTRIES_PATH.write_text(json.dumps({"entries": entries}, indent=2) + "\n")
     subprocess.run(
         [sys.executable, str(SCRIPTS_DIR / "generate-readme.py")],
         check=True
