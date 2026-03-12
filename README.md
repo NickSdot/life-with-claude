@@ -2,17 +2,18 @@
 
 Working with Claude Code is rather brilliant. This repository is where I keep constructive feedback to help make it even better — bugs to squash, rough edges to smooth, and wishes for the future.
 
-🐛 Bug · 🤔 Flaw · 💫 Wish
+**Type:** 🐛 Bug · 🤔 Flaw · 💫 Wish
+**Priority:** 🔴 High · 🟡 Medium · 🟢 Low
 
 ## Open
 
-| Type | ID | ⭐ | Title | Issue |
+| Type | ID | Prio | Title | Issue |
 |------|----|----|-------|-------|
-| 🐛 | B003 | ⭐⭐ | [--agents flag agents invisible to Claude despite appearing in /agents](#b003) | [#33513](https://github.com/anthropics/claude-code/issues/33513) |
-| 🤔 | F001 | ⭐⭐ | [Plan mode compacts context too aggressively near completion](#f001) | [#29371](https://github.com/anthropics/claude-code/issues/29371) |
-| 🤔 | F002 | ⭐⭐ | [Compaction doesn't start automatically after Claude exhausts context](#f002) | [#29780](https://github.com/anthropics/claude-code/issues/29780) |
-| 🤔 | F003 | ⭐⭐ | [Task references use invisible IDs instead of visible titles](#f003) | [#29800](https://github.com/anthropics/claude-code/issues/29800) |
-| 💫 | W001 | ⭐ | [Add turnDurationOverride setting for custom turn duration messages](#w001) | [#30979](https://github.com/anthropics/claude-code/issues/30979) |
+| 🐛 | B003 | 🟡 | [--agents flag agents invisible to Claude despite appearing in /agents](#b003) | [#33513](https://github.com/anthropics/claude-code/issues/33513) |
+| 🤔 | F001 | 🟡 | [Plan mode compacts context too aggressively near completion](#f001) | [#29371](https://github.com/anthropics/claude-code/issues/29371) |
+| 🤔 | F002 | 🟡 | [Compaction doesn't start automatically after Claude exhausts context](#f002) | [#29780](https://github.com/anthropics/claude-code/issues/29780) |
+| 🤔 | F003 | 🟡 | [Task references use invisible IDs instead of visible titles](#f003) | [#29800](https://github.com/anthropics/claude-code/issues/29800) |
+| 💫 | W001 | 🟢 | [Add turnDurationOverride setting for custom turn duration messages](#w001) | [#30979](https://github.com/anthropics/claude-code/issues/30979) |
 
 ### B003
 **--agents flag agents invisible to Claude despite appearing in /agents**
@@ -37,10 +38,10 @@ The showTurnDuration setting controls whether the turn duration message appears 
 
 ## Done
 
-| Type | ID | ⭐ | Title | Issue |
+| Type | ID | Prio | Title | Issue |
 |------|----|----|-------|-------|
-| 🐛 | B001 | ⭐⭐⭐ | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
-| 🐛 | B002 | ⭐⭐ | [Unsupported model in agent config silently fails instead of erroring](#b002) | [#32415](https://github.com/anthropics/claude-code/issues/32415) |
+| 🐛 | B001 | 🔴 | [Bash tool duplicates output for failed commands](#b001) | [#27621](https://github.com/anthropics/claude-code/issues/27621) |
+| 🐛 | B002 | 🟡 | [Unsupported model in agent config silently fails instead of erroring](#b002) | [#32415](https://github.com/anthropics/claude-code/issues/32415) |
 
 ### B001
 **Bash tool duplicates output for failed commands**
