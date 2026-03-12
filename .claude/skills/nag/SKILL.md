@@ -47,6 +47,7 @@ All mutation scripts update `entries.json` and regenerate `README.md` automatica
 | `query.py search "query"` | Find entries | JSON array |
 | `query.py next-id <category>` | Next ID (accepts "🐛 Bug" or "bug") | e.g. `B001` |
 | `query.py get ID` | Get single entry | JSON object (includes `issue_url`) |
+| `query.py list` | All entries | JSON array |
 | `add-entry.py '<json>'` | Add entry (accepts raw answers) | Confirms |
 | `mark-done.py ID` | Mark done | `TITLE:...` |
 | `update-entry.py ID field value` | Edit (title, priority, description, issue_url, category) | Confirms |
