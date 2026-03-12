@@ -14,9 +14,9 @@
       "question": "How much does it matter?",
       "header": "Priority",
       "options": [
-        {"label": "⭐⭐⭐ High", "description": "Properly getting in the way"},
-        {"label": "⭐⭐ Medium", "description": "Noticeable but manageable"},
-        {"label": "⭐ Low", "description": "Nice to have, no rush"}
+        {"label": "🔴 High", "description": "Properly getting in the way"},
+        {"label": "🟡 Medium", "description": "Noticeable but manageable"},
+        {"label": "🟢 Low", "description": "Nice to have, no rush"}
       ],
       "multiSelect": false
     },

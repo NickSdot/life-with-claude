@@ -37,23 +37,24 @@ Track issues about Claude Code.
 
 ## Scripts
 
-All in `scripts/`. Run Python scripts with `python3`, e.g. `python3 parse-readme.py stats`.
+All in `scripts/`. Run Python scripts with `python3`, e.g. `python3 query.py stats`.
 Accept raw questionnaire answers directly (e.g. "🐛 Bug" → normalized internally).
+All mutation scripts update `entries.json` and regenerate `README.md` automatically.
 
 | Script | Usage | Returns |
 |--------|-------|---------|
-| `parse-readme.py stats` | Get counts | `{"bugs":N,"flaws":N,"wishes":N}` |
-| `parse-readme.py search "query"` | Find entries | JSON array |
-| `parse-readme.py next-id <category>` | Next ID (accepts "🐛 Bug" or "bug") | e.g. `B001` |
+| `query.py stats` | Get open counts | `{"bug":N,"flaw":N,"wish":N}` |
+| `query.py search "query"` | Find entries | JSON array |
+| `query.py next-id <category>` | Next ID (accepts "🐛 Bug" or "bug") | e.g. `B001` |
+| `query.py get ID` | Get single entry | JSON object (includes `issue_url`) |
+| `query.py list` | All entries | JSON array |
 | `add-entry.py '<json>'` | Add entry (accepts raw answers) | Confirms |
 | `mark-done.py ID` | Mark done | `TITLE:...` |
-| `update-entry.py ID field value` | Edit | Confirms |
-| `link-issue.py ID url` | Link GH issue to entry | Updates README |
+| `update-entry.py ID field value` | Edit (title, priority, description, issue_url, category) | Confirms |
+| `generate-readme.py` | Regenerate README from JSON | — |
 | `commit.sh "msg" [files]` | Git commit (no push) | — |
 | `push.sh` | Git push | — |
-| `create-issue.sh ID title body-file` | GH issue | `ISSUE_URL:...` |
-| `issues.py get ID` | Get tracked issue URL | URL or "none" |
-| `issues.py set ID url` | Track issue URL or "none" | — |
+| `create-issue.sh template title body-file` | GH issue | `ISSUE_URL:...` |
 
 ## Questions
 
@@ -81,7 +82,7 @@ In `templates/`. To use a template:
 | File | Placeholders |
 |------|-------------|
 | `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}`, `{{GITHUB_ISSUE_BODY}}` |
-| `status.md` | `{{BUGS}}`, `{{FLAWS}}`, `{{WISHES}}` |
+| `status.md` | `{{BUG}}`, `{{FLAW}}`, `{{WISH}}` |
 | `celebration.md` | `{{ID}}`, `{{TITLE}}` |
 | `edit-display.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}` |
 
@@ -126,19 +127,19 @@ Use these exactly as shown (from the GitHub YAML templates):
 | model | `[MODEL] ` |
 | feature | `[FEATURE] ` |
 
-Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (nice to have)
+Priority: 🔴=High (blocks work), 🟡=Medium (notable), 🟢=Low (nice to have)
 
 ## Lookup (for fin/yay/doh)
 
 1. No target? Ask user.
 2. Matches `[BFW]\d+`? Direct ID lookup.
-3. Otherwise: `parse-readme.py search "query"` → 1 match=use, multiple=ask, none=suggest `/nag`.
+3. Otherwise: `query.py search "query"` → 1 match=use, multiple=ask, none=suggest `/nag`.
 
 ---
 
 ## Workflow: /nag (stats)
 
-1. `parse-readme.py stats`
+1. `query.py stats`
 2. Read `templates/status.md`, fill counts, display
 
 ## Workflow: /nag add [text]
@@ -166,7 +167,7 @@ Priority: `⭐⭐⭐`=High (blocks work), `⭐⭐`=Medium (notable), `⭐`=Low (
 - "📝 None" → `none` (no GitHub issue)
 
 Then:
-1. `python3 parse-readme.py next-id <category>` → get ID (e.g. "B001")
+1. `python3 query.py next-id <category>` → get ID (e.g. "B001")
 2. **If template is NOT "none":**
    - Read the chosen template (e.g. `templates/github-issue-bug.md`), fill all `{{PLACEHOLDERS}}`. This becomes `{{GITHUB_ISSUE_BODY}}`
    - Read `templates/proposal.md`, fill all placeholders, output as markdown
@@ -179,12 +180,11 @@ Then:
 5. **If template is NOT "none":** create the GitHub issue now:
    - Write the approved `{{GITHUB_ISSUE_BODY}}` to `details/{ID}.md`
    - `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:` from output
-6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-7. **If issue was created:** `python3 link-issue.py {ID} {url}` → adds issue link to README entry
-8. `python3 issues.py set {ID} {url_or_"none"}` → track URL or "none"
-9. `commit.sh "➕ {ID}: {title}" README.md details/issues.json details/`
-10. `push.sh`
-11. **If template is "none":** "Done. This entry won't create a GitHub issue."
+6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"...","issue_url":"..."}'`
+   - Include `"issue_url"` only if an issue was created; omit it otherwise
+7. `commit.sh "➕ {ID}: {title}" README.md details/`
+8. `push.sh`
+9. **If template is "none":** "Done. This entry won't create a GitHub issue."
     **Otherwise:** Output the issue URL.
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
@@ -193,39 +193,36 @@ If user wants extended details during edit: load `reference/detail-files.md`, co
 
 Creates a GitHub issue for entries that were added without one (template "none" or failed creation).
 
-1. Lookup entry
-2. `python3 issues.py get {ID}` → check stored value:
-   - If starts with `http` → output "Issue already exists: {url}" and stop
-   - If `"none"` or not found → continue
+1. Lookup entry via `query.py get {ID}`
+2. Check `issue_url`:
+   - If set → output "Issue already exists: {url}" and stop
+   - If null → continue
 3. Ask which template to use (AskUserQuestion with template options from `questions/add.json`, template question only)
-4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
-5. Read the chosen template file, fill all `{{PLACEHOLDERS}}`
-6. Write issue body to `details/{ID}.md`
-7. `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:`
-8. `python3 link-issue.py {ID} {url}` → updates README with issue link
-9. `python3 issues.py set {ID} {url}` → replace stored data with URL
-10. `commit.sh "📤 {ID}: Created issue" README.md details/issues.json details/`
-11. `push.sh`
-12. Output the issue URL
+4. Read the chosen template file, fill all `{{PLACEHOLDERS}}`
+5. Write issue body to `details/{ID}.md`
+6. `create-issue.sh "{template}" "{entry_title}" "details/{ID}.md"` → parse `ISSUE_URL:`
+7. `python3 update-entry.py {ID} issue_url {url}`
+8. `commit.sh "📤 {ID}: Created issue" README.md details/`
+9. `push.sh`
+10. Output the issue URL
 
 ## Workflow: /nag yay <target>
 
-1. Lookup entry
+1. Lookup entry via `query.py get {ID}`
 2. `mark-done.py {ID}` → get title
-3. `python3 issues.py get {ID}` → if URL returned, close it: `gh issue close {url}`
-4. `commit.sh "✅ {ID}: {title}"`
+3. If `issue_url` is set → `gh issue close {url}`
+4. `commit.sh "✅ {ID}: {title}" README.md details/`
 5. `push.sh`
 6. Celebrate via `templates/celebration.md`
 
 ## Workflow: /nag doh <target>
 
-1. Lookup entry
-2. `parse-readme.py search "{ID}"` → get current state as JSON
-3. Display current state via `templates/edit-display.md` (fill + output)
-4. `issues.py get {ID}` → if URL returned, mention "Also tracked as issue: {url}"
-5. Ask via `questions/edit-field.json` → user picks field (title/priority/description/category)
-6. Ask user: "What should the new {field} be?" (free text via AskUserQuestion with 2 placeholder options)
-7. `update-entry.py {ID} {field} "{new_value}"`
-8. `commit.sh "📝 {ID}: Updated {field}"`
-9. If issue URL exists → `gh issue edit {url} --title` or `--body` to sync
-10. `push.sh`
+1. Lookup entry via `query.py get {ID}`
+2. Display current state via `templates/edit-display.md` (fill + output)
+3. If `issue_url` is set → mention "Also tracked as issue: {url}"
+4. Ask via `questions/edit-field.json` → user picks field (title/priority/description/category)
+5. Ask user: "What should the new {field} be?" (free text via AskUserQuestion with 2 placeholder options)
+6. `update-entry.py {ID} {field} "{new_value}"`
+7. `commit.sh "📝 {ID}: Updated {field}" README.md details/`
+8. If `issue_url` is set → `gh issue edit {url} --title` or `--body` to sync
+9. `push.sh`
