@@ -81,7 +81,7 @@ In `templates/`. To use a template:
 | File | Placeholders |
 |------|-------------|
 | `proposal.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}`, `{{GITHUB_ISSUE_BODY}}` |
-| `status.md` | `{{BUGS}}`, `{{FLAWS}}`, `{{WISHES}}` |
+| `status.md` | `{{BUG}}`, `{{FLAW}}`, `{{WISH}}` |
 | `celebration.md` | `{{ID}}`, `{{TITLE}}` |
 | `edit-display.md` | `{{ID}}`, `{{EMOJI}}`, `{{CATEGORY}}`, `{{PRIORITY}}`, `{{TITLE}}`, `{{DESCRIPTION}}` |
 

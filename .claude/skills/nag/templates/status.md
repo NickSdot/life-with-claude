@@ -2,7 +2,7 @@
 📋 LIFE WITH CLAUDE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Open: {{BUGS}} bugs · {{FLAWS}} flaws · {{WISHES}} wishes
+Open: {{BUG}} bugs · {{FLAW}} flaws · {{WISH}} wishes
 
   /nag add    — Log something new
   /nag fin    — Create GitHub issue
