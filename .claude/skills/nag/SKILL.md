@@ -177,51 +177,46 @@ Then:
    - "Lovely" → continue to step 5
    - "Hang on" → ask what to change, update values, go back to step 2
    - "No" → output "Alright, discarded." and stop
-5. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
-6. Write the approved `{{GITHUB_ISSUE_BODY}}` to `.claude/tmp/nag-body-{ID}.md`
-7. `python3 issues.py set {ID} {template} .claude/tmp/nag-body-{ID}.md` → store template + approved body
-8. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json`
-9. **If template is "none":** "Committed locally. This entry won't create a GitHub issue."
-   **Otherwise:** "Committed locally. Run `/nag fin {ID}` when ready to push and file with Anthropic."
+5. **If template is NOT "none":** create the GitHub issue now:
+   - Write the approved `{{GITHUB_ISSUE_BODY}}` to `details/nag-body-{ID}.md`
+   - `create-issue.sh "{template}" "{entry_title}" "details/nag-body-{ID}.md"` → parse `ISSUE_URL:` from output
+6. `python3 add-entry.py '{"id":"...","category":"...","priority":"...","title":"...","description":"..."}'`
+7. **If issue was created:** `python3 link-issue.py {ID} {url}` → adds issue link to README entry
+8. `python3 issues.py set {ID} {url_or_"none"}` → track URL or "none"
+9. `commit.sh "➕ {ID}: {title}" README.md .claude/skills/nag/issues.json details/`
+10. `push.sh`
+11. **If template is "none":** "Done. This entry won't create a GitHub issue."
+    **Otherwise:** Output the issue URL.
 
 If user wants extended details during edit: load `reference/detail-files.md`, collect content, write to `details/{ID}.md`, include in commit.
 
 ## Workflow: /nag fin <target>
 
-Load `reference/detail-files.md`.
+Creates a GitHub issue for entries that were added without one (template "none" or failed creation).
 
 1. Lookup entry
 2. `python3 issues.py get {ID}` → check stored value:
-   - If `"none"` → output "No GitHub issue configured for this entry." and stop
    - If starts with `http` → output "Issue already exists: {url}" and stop
-   - If JSON object with `template` and `body` → use stored body (skip steps 5-7)
-   - If template name (`bug`, `model`, `feature`) → continue with that template
-   - If not found (exit 1) → ask which template to use
-3. `push.sh` → push any pending commits first
+   - If `"none"` or not found → continue
+3. Ask which template to use (AskUserQuestion with template options from `questions/add.json`, template question only)
 4. `python3 parse-readme.py search "{ID}"` → get entry details as JSON
-5. Check if `details/{ID}.md` exists (Read tool)
-6. Read the template file based on stored value:
-   - `bug` → `templates/github-issue-bug.md`
-   - `model` → `templates/github-issue-model.md`
-   - `feature` → `templates/github-issue-feature.md`
-7. Fill all `{{PLACEHOLDERS}}` in the template
-8. Write issue body to `.claude/tmp/nag-issue-{ID}.md`:
-   - If stored value has `body` field → use that directly
-   - Otherwise → use filled template from step 7
-9. `create-issue.sh "{template}" "{entry_title}" ".claude/tmp/nag-issue-{ID}.md"` → parse `ISSUE_URL:` from output (script adds the prefix automatically)
-10. `python3 link-issue.py {ID} {url}` → updates README with issue link
-11. `python3 issues.py set {ID} {url}` → replace stored data with actual URL
-12. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json`
-13. `push.sh`
-14. Output the issue URL
+5. Read the chosen template file, fill all `{{PLACEHOLDERS}}`
+6. Write issue body to `details/nag-body-{ID}.md`
+7. `create-issue.sh "{template}" "{entry_title}" "details/nag-body-{ID}.md"` → parse `ISSUE_URL:`
+8. `python3 link-issue.py {ID} {url}` → updates README with issue link
+9. `python3 issues.py set {ID} {url}` → replace stored data with URL
+10. `commit.sh "📤 {ID}: Created issue" README.md .claude/skills/nag/issues.json details/`
+11. `push.sh`
+12. Output the issue URL
 
 ## Workflow: /nag yay <target>
 
 1. Lookup entry
 2. `mark-done.py {ID}` → get title
-3. `commit.sh "✅ {ID}: {title}"`
-4. Celebrate via `templates/celebration.md`
-5. Remind user: "Committed locally. Run `/nag fin {ID}` to push."
+3. `python3 issues.py get {ID}` → if URL returned, close it: `gh issue close {url}`
+4. `commit.sh "✅ {ID}: {title}"`
+5. `push.sh`
+6. Celebrate via `templates/celebration.md`
 
 ## Workflow: /nag doh <target>
 
@@ -234,4 +229,4 @@ Load `reference/detail-files.md`.
 7. `update-entry.py {ID} {field} "{new_value}"`
 8. `commit.sh "📝 {ID}: Updated {field}"`
 9. If issue URL exists → `gh issue edit {url} --title` or `--body` to sync
-10. Remind user: "Committed locally. Run `/nag fin {ID}` to push."
+10. `push.sh`
