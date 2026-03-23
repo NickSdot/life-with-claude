@@ -24,7 +24,7 @@
       "priority": "medium",
       "title": "--agents flag agents invisible to Claude despite appearing in /agents",
       "description": "When I launch Claude Code with --agents to define agents programmatically, Claude cannot find or spawn them when asked. However, the same agents appear correctly in the /agents list under CLI arg agents. No workarounds.",
-      "done": false,
+      "done": true,
       "issue_url": "https://github.com/anthropics/claude-code/issues/33513"
     },
     {
